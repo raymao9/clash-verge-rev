@@ -173,7 +173,7 @@ export const ProfileMore = (props: Props) => {
             <Typography
               noWrap
               title={itemData.desc}
-              sx={i18n.language === "zh" ? { width: "calc(100% - 75px)" } : {}}
+              sx={i18n.language === "tw" ? { width: "calc(100% - 75px)" } : {}}
             >
               {itemData.desc}
             </Typography>

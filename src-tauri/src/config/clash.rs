@@ -40,9 +40,9 @@ impl IClashTemp {
         tun.insert("dns-hijack".into(), vec!["any:53"].into());
         tun.insert("mtu".into(), 9000.into());
 
-        map.insert("mixed-port".into(), 7897.into());
-        map.insert("socks-port".into(), 7898.into());
-        map.insert("port".into(), 7899.into());
+        map.insert("mixed-port".into(), 7890.into());
+        map.insert("socks-port".into(), 1080.into());
+        map.insert("port".into(), 1087.into());
         map.insert("log-level".into(), "info".into());
         map.insert("allow-lan".into(), false.into());
         map.insert("mode".into(), "rule".into());
@@ -149,9 +149,9 @@ impl IClashTemp {
                 Value::Number(val_num) => val_num.as_u64().map(|u| u as u16),
                 _ => None,
             })
-            .unwrap_or(7899);
+            .unwrap_or(1087);
         if port == 0 {
-            port = 7899;
+            port = 1087;
         }
         port
     }
@@ -216,8 +216,8 @@ fn test_clash_info() {
     fn get_result<S: Into<String>>(port: u16, server: S) -> ClashInfo {
         ClashInfo {
             mixed_port: port,
-            socks_port: 7898,
-            port: 7899,
+            socks_port: 1080,
+            port: 1087,
             server: server.into(),
             secret: None,
         }

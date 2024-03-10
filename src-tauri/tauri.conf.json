@@ -30,11 +30,11 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "https://mirror.ghproxy.com/https://github.com/clash-verge-rev/clash-verge-rev/releases/download/updater/update-proxy.json",
-        "https://github.com/clash-verge-rev/clash-verge-rev/releases/download/updater/update.json"
+        "https://mirror.ghproxy.com/https://github.com/raymao9/clash-verge-rev/releases/download/updater/update-proxy.json",
+        "https://github.com/raymao9/clash-verge-rev/releases/download/updater/update.json"
       ],
       "dialog": false,
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEQyOEMyRjBCQkVGOUJEREYKUldUZnZmbStDeStNMHU5Mmo1N24xQXZwSVRYbXA2NUpzZE5oVzlqeS9Bc0t6RVV4MmtwVjBZaHgK"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IENCMDZCMjMzRkE5MDU4OTYKUldTV1dKRDZNN0lHeXorNms4MDFLYkk4MnJmRmYxZ3NFaVA4ZXJPWWN1Y2pnNHVEdXhFLzZWbmIK"
     },
     "allowlist": {
       "shell": {

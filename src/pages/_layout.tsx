@@ -20,11 +20,10 @@ import { BaseErrorBoundary, Notice } from "@/components/base";
 import { LayoutItem } from "@/components/layout/layout-item";
 import { LayoutControl } from "@/components/layout/layout-control";
 import { LayoutTraffic } from "@/components/layout/layout-traffic";
-import { UpdateButton } from "@/components/layout/update-button";
 import { useCustomTheme } from "@/components/layout/use-custom-theme";
 import getSystem from "@/utils/get-system";
-import "dayjs/locale/ru";
 import "dayjs/locale/zh-cn";
+import "dayjs/locale/zh-tw";
 import { getPortableFlag } from "@/services/cmds";
 import { useNavigate } from "react-router-dom";
 export let portableFlag = false;
@@ -89,7 +88,8 @@ const Layout = () => {
 
   useEffect(() => {
     if (language) {
-      dayjs.locale(language === "zh" ? "zh-cn" : language);
+      dayjs.locale(language === "tw" ? "zh-tw" : language);
+      dayjs.locale(language === "cn" ? "zh-cn" : language);
       i18next.changeLanguage(language);
     }
     if (start_page) {
@@ -130,7 +130,7 @@ const Layout = () => {
           <div className="layout__left" data-windrag>
             <div className="the-logo" data-windrag>
               {!isDark ? <LogoSvg /> : <LogoSvg_dark />}
-              {!portableFlag && <UpdateButton className="the-newbtn" />}
+              {!portableFlag}
             </div>
 
             <List className="the-menu">

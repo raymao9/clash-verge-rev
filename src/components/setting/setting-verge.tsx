@@ -86,10 +86,10 @@ const SettingVerge = ({ onError }: Props) => {
           onChange={(e) => onChangeData({ language: e })}
           onGuard={(e) => patchVerge({ language: e })}
         >
-          <Select size="small" sx={{ width: 100, "> div": { py: "7.5px" } }}>
-            <MenuItem value="zh">中文</MenuItem>
+          <Select size="small" sx={{ width: 140, "> div": { py: "7.5px" } }}>
+            <MenuItem value="tw">繁體中文</MenuItem>
+            <MenuItem value="cn">简体中文</MenuItem>
             <MenuItem value="en">English</MenuItem>
-            <MenuItem value="ru">Русский</MenuItem>
           </Select>
         </GuardState>
       </SettingItem>
@@ -104,25 +104,6 @@ const SettingVerge = ({ onError }: Props) => {
           <ThemeModeSwitch />
         </GuardState>
       </SettingItem>
-
-      {OS !== "linux" && (
-        <SettingItem label={t("Tray Click Event")}>
-          <GuardState
-            value={tray_event ?? "main_window"}
-            onCatch={onError}
-            onFormat={(e: any) => e.target.value}
-            onChange={(e) => onChangeData({ tray_event: e })}
-            onGuard={(e) => patchVerge({ tray_event: e })}
-          >
-            <Select size="small" sx={{ width: 140, "> div": { py: "7.5px" } }}>
-              <MenuItem value="main_window">{t("Show Main Window")}</MenuItem>
-              <MenuItem value="system_proxy">{t("System Proxy")}</MenuItem>
-              <MenuItem value="tun_mode">{t("Tun Mode")}</MenuItem>
-              <MenuItem value="disable">{t("Disable")}</MenuItem>
-            </Select>
-          </GuardState>
-        </SettingItem>
-      )}
 
       <SettingItem label={t("Copy Env Type")}>
         <GuardState
@@ -260,6 +241,36 @@ const SettingVerge = ({ onError }: Props) => {
         </IconButton>
       </SettingItem>
 
+      {OS !== "linux" && (
+        <SettingItem label={t("Tray Click Event")}>
+          <GuardState
+            value={tray_event ?? "main_window"}
+            onCatch={onError}
+            onFormat={(e: any) => e.target.value}
+            onChange={(e) => onChangeData({ tray_event: e })}
+            onGuard={(e) => patchVerge({ tray_event: e })}
+          >
+            <Select size="small" sx={{ width: 160, "> div": { py: "7.5px" } }}>
+              <MenuItem value="main_window">{t("Show Main Window")}</MenuItem>
+              <MenuItem value="system_proxy">{t("System Proxy")}</MenuItem>
+              <MenuItem value="tun_mode">{t("Tun Mode")}</MenuItem>
+              <MenuItem value="disable">{t("Disable")}</MenuItem>
+            </Select>
+          </GuardState>
+        </SettingItem>
+      )}
+
+      <SettingItem label={t("Open Logs Dir")}>
+        <IconButton
+          color="inherit"
+          size="small"
+          sx={{ my: "2px" }}
+          onClick={openLogsDir}
+        >
+          <ArrowForward />
+        </IconButton>
+      </SettingItem>
+
       <SettingItem label={t("Open App Dir")}>
         <IconButton
           color="inherit"
@@ -277,28 +288,6 @@ const SettingVerge = ({ onError }: Props) => {
           size="small"
           sx={{ my: "2px" }}
           onClick={openCoreDir}
-        >
-          <ArrowForward />
-        </IconButton>
-      </SettingItem>
-
-      <SettingItem label={t("Open Logs Dir")}>
-        <IconButton
-          color="inherit"
-          size="small"
-          sx={{ my: "2px" }}
-          onClick={openLogsDir}
-        >
-          <ArrowForward />
-        </IconButton>
-      </SettingItem>
-
-      <SettingItem label={t("Check for Updates")}>
-        <IconButton
-          color="inherit"
-          size="small"
-          sx={{ my: "2px" }}
-          onClick={onCheckUpdate}
         >
           <ArrowForward />
         </IconButton>

@@ -14,81 +14,85 @@ pub struct Tray {}
 
 impl Tray {
     pub fn tray_menu(app_handle: &AppHandle) -> SystemTrayMenu {
-        let zh = { Config::verge().latest().language == Some("zh".into()) };
-
+        let tw = { Config::verge().latest().language == Some("tw".into()) };
+	let cn = { Config::verge().latest().language == Some("cn".into()) };
         let version = app_handle.package_info().version.to_string();
 
         macro_rules! t {
-            ($en: expr, $zh: expr) => {
-                if zh {
-                    $zh
+            ($tw: expr, $cn: expr, $en: expr) => {
+                if tw {
+                    $tw
                 } else {
-                    $en
-                }
+		    if cn {
+			$cn
+		    } else {
+		    	$en
+		    }
+		}
             };
         }
 
         SystemTrayMenu::new()
             .add_item(CustomMenuItem::new(
                 "open_window",
-                t!("Dashboard", "打开面板"),
+                t!("打開主視窗", "显示主窗口", "Dashboard"),
             ))
             .add_native_item(SystemTrayMenuItem::Separator)
             .add_item(CustomMenuItem::new(
                 "rule_mode",
-                t!("Rule Mode", "规则模式"),
+                t!("分流模式", "规则模式", "Rule Mode"),
             ))
             .add_item(CustomMenuItem::new(
                 "global_mode",
-                t!("Global Mode", "全局模式"),
+                t!("全局模式", "全局模式", "Global Mode"),
             ))
             .add_item(CustomMenuItem::new(
                 "direct_mode",
-                t!("Direct Mode", "直连模式"),
+                t!("直連模式", "直连模式", "Direct Mode"),
             ))
             .add_native_item(SystemTrayMenuItem::Separator)
             .add_item(CustomMenuItem::new(
                 "system_proxy",
-                t!("System Proxy", "系统代理"),
+                t!("啟用系統代理", "打开系统代理", "System Proxy"),
             ))
-            .add_item(CustomMenuItem::new("tun_mode", t!("TUN Mode", "Tun 模式")))
+            .add_item(CustomMenuItem::new("tun_mode", t!("啟用 Tun 模式", "打开 Tun 模式", "TUN Mode")))
             .add_item(CustomMenuItem::new(
                 "copy_env",
-                t!("Copy Env", "复制环境变量"),
+                t!("複製終端機代理指令", "复制环境变量", "Copy Env"),
             ))
             .add_submenu(SystemTraySubmenu::new(
-                t!("Open Dir", "打开目录"),
+                t!("打開檔案位置", "打开目录", "Open Dir"),
                 SystemTrayMenu::new()
                     .add_item(CustomMenuItem::new(
+                        "open_logs_dir",
+                        t!("連線記錄所在位置", "日志目录", "Logs Dir"),
+                    ))
+                    .add_item(CustomMenuItem::new(
                         "open_app_dir",
-                        t!("App Dir", "应用目录"),
+                        t!("應用程式所在位置", "应用目录", "App Dir"),
                     ))
                     .add_item(CustomMenuItem::new(
                         "open_core_dir",
-                        t!("Core Dir", "内核目录"),
-                    ))
-                    .add_item(CustomMenuItem::new(
-                        "open_logs_dir",
-                        t!("Logs Dir", "日志目录"),
+                        t!("Clash 核心所在位置", "内核目录", "Core Dir"),
                     )),
             ))
             .add_submenu(SystemTraySubmenu::new(
-                t!("More", "更多"),
+                t!("更多功能", "更多", "More"),
                 SystemTrayMenu::new()
                     .add_item(CustomMenuItem::new(
                         "restart_clash",
-                        t!("Restart Clash", "重启 Clash"),
+                        t!("重啟 Clash", "重启 Clash", "Restart Clash"),
                     ))
                     .add_item(CustomMenuItem::new(
                         "restart_app",
-                        t!("Restart App", "重启应用"),
+                        t!("重啟 APP", "重启 APP", "Restart App"),
                     ))
                     .add_item(
                         CustomMenuItem::new("app_version", format!("Version {version}")).disabled(),
                     ),
             ))
             .add_native_item(SystemTrayMenuItem::Separator)
-            .add_item(CustomMenuItem::new("quit", t!("Quit", "退出")).accelerator("CmdOrControl+Q"))
+            .add_item(CustomMenuItem::new("quit", t!("結束", "退出", "Quit")).accelerator("CmdOrControl+Q"))
     }
 
     pub fn update_systray(app_handle: &AppHandle) -> Result<()> {
@@ -100,17 +104,22 @@ impl Tray {
     }
 
     pub fn update_part(app_handle: &AppHandle) -> Result<()> {
-        let zh = { Config::verge().latest().language == Some("zh".into()) };
+        let tw = { Config::verge().latest().language == Some("tw".into()) };
+	let cn = { Config::verge().latest().language == Some("cn".into()) };
 
         let version = app_handle.package_info().version.to_string();
 
         macro_rules! t {
-            ($en: expr, $zh: expr) => {
-                if zh {
-                    $zh
+            ($tw: expr, $cn: expr, $en: expr) => {
+                if tw {
+                    $tw
                 } else {
-                    $en
-                }
+		    if cn {
+			$cn
+		    } else {
+		    	$en
+		    }
+		}
             };
         }
 
@@ -192,9 +201,9 @@ impl Tray {
 
         let _ = tray.set_tooltip(&format!(
             "Clash Verge {version}\n{}: {}\n{}: {}",
-            t!("System Proxy", "系统代理"),
+            t!("系統代理", "系统代理", "System Proxy"),
             switch_map[system_proxy],
-            t!("TUN Mode", "Tun 模式"),
+            t!("Tun 模式", "Tun 模式", "TUN Mode"),
             switch_map[tun_mode]
         ));
 
@@ -224,9 +233,9 @@ impl Tray {
                 "system_proxy" => feat::toggle_system_proxy(),
                 "tun_mode" => feat::toggle_tun_mode(),
                 "copy_env" => feat::copy_clash_env(app_handle),
+                "open_logs_dir" => crate::log_err!(cmds::open_logs_dir()),
                 "open_app_dir" => crate::log_err!(cmds::open_app_dir()),
                 "open_core_dir" => crate::log_err!(cmds::open_core_dir()),
-                "open_logs_dir" => crate::log_err!(cmds::open_logs_dir()),
                 "restart_clash" => feat::restart_clash_core(),
                 "restart_app" => api::process::restart(&app_handle.env()),
                 "quit" => cmds::exit_app(app_handle.clone()),

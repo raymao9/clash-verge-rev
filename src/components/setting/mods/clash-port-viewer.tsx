@@ -14,13 +14,13 @@ export const ClashPortViewer = forwardRef<DialogRef>((props, ref) => {
 
   const [open, setOpen] = useState(false);
   const [mixedPort, setMixedPort] = useState(
-    verge?.verge_mixed_port ?? clashInfo?.mixed_port ?? 7897
+    verge?.verge_mixed_port ?? clashInfo?.mixed_port ?? 7890
   );
   const [socksPort, setSocksPort] = useState(
-    verge?.verge_socks_port ?? clashInfo?.socks_port ?? 7898
+    verge?.verge_socks_port ?? clashInfo?.socks_port ?? 1080
   );
   const [port, setPort] = useState(
-    verge?.verge_port ?? clashInfo?.port ?? 7899
+    verge?.verge_port ?? clashInfo?.port ?? 1087
   );
 
   useImperativeHandle(ref, () => ({

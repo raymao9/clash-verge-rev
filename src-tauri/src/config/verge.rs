@@ -169,7 +169,7 @@ impl IVerge {
     pub fn template() -> Self {
         Self {
             clash_core: Some("clash-meta".into()),
-            language: Some("zh".into()),
+            language: Some("tw".into()),
             theme_mode: Some("system".into()),
             #[cfg(not(target_os = "windows"))]
             env_type: Some("bash".into()),
@@ -187,9 +187,9 @@ impl IVerge {
             enable_silent_start: Some(false),
             enable_system_proxy: Some(false),
             enable_random_port: Some(false),
-            verge_mixed_port: Some(7897),
-            verge_socks_port: Some(7898),
-            verge_port: Some(7899),
+            verge_mixed_port: Some(7890),
+            verge_socks_port: Some(1080),
+            verge_port: Some(1087),
             enable_proxy_guard: Some(false),
             proxy_guard_duration: Some(30),
             auto_close_connection: Some(true),
