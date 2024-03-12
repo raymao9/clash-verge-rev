@@ -123,6 +123,7 @@
   "Open Core Dir": "Clash 核心所在位置",
   "Open Logs Dir": "連線記錄所在位置",
   "Check for Updates": "檢測更新",
+  "Open Dev Tools": "軟體偵錯工具",
   "Verge Version": "Verge 版本",
   "theme.light": "淺色",
   "theme.dark": "深色",
@@ -151,7 +152,7 @@
 
   "App Log Level": "APP 記錄層級",
   "Auto Close Connections": "自動中止連線",
-  "Enable Clash Fields Filter": "啟用 Clash 欄位篩選",
+  "Auto Check Update": "自動檢測更新",
   "Enable Builtin Enhanced": "啟用內建增強功能",
   "Proxy Layout Column": "節點每行數量",
   "Default Latency Test": "延遲測試位址",

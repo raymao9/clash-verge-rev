@@ -123,6 +123,7 @@
   "Open Core Dir": "内核目录",
   "Open Logs Dir": "日志目录",
   "Check for Updates": "检查更新",
+  "Open Dev Tools": "打开开发者工具",
   "Verge Version": "Verge 版本",
   "theme.light": "浅色",
   "theme.dark": "深色",
@@ -151,7 +152,7 @@
 
   "App Log Level": "App日志等级",
   "Auto Close Connections": "自动关闭连接",
-  "Enable Clash Fields Filter": "开启 Clash 字段过滤",
+  "Auto Check Update": "自动检查更新",
   "Enable Builtin Enhanced": "开启内建增强功能",
   "Proxy Layout Column": "代理页布局列数",
   "Default Latency Test": "默认测试链接",

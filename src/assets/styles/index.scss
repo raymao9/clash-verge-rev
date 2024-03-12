@@ -35,6 +35,9 @@ body {
   border-radius: 6px;
   background-color: var(--scroller-color);
 }
+*::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
 
 body {
   overflow: hidden;
@@ -57,6 +60,6 @@ body {
   -ms-user-select: none;
 }
 
-[data-windrag] {
+[data-tauri-drag-region] {
   app-region: drag;
 }
