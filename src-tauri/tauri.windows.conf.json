@@ -16,7 +16,7 @@
         "nsis": {
           "displayLanguageSelector": true,
           "installerIcon": "icons/icon.ico",
-          "languages": ["SimpChinese", "English"],
+          "languages": ["TradChinese", "SimpChinese", "English"],
           "license": "../LICENSE",
           "installMode": "perMachine",
           "template": "./template/installer.nsi"

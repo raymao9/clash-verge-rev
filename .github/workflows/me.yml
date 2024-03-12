@@ -11,7 +11,8 @@ env:
   RUST_BACKTRACE: short
 
 jobs:
-  release:
+  release-windows:
+    name: Windows
     strategy:
       fail-fast: false
       matrix:
@@ -20,10 +21,6 @@ jobs:
             target: x86_64-pc-windows-msvc
           - os: windows-latest
             target: aarch64-pc-windows-msvc
-          - os: macos-latest
-            target: aarch64-apple-darwin
-          - os: macos-latest
-            target: x86_64-apple-darwin
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -36,7 +33,6 @@ jobs:
           git config --global user.email "rayfish2020@gmail.com"
           git config --global user.name "raymao9"
           git am patches/support-windows-aarch64.patch
-
       - name: Init Submodule
         if: matrix.target == 'aarch64-pc-windows-msvc'
         run: git submodule update --init --recursive
@@ -67,7 +63,6 @@ jobs:
         run: |
           pnpm i
           pnpm check ${{ matrix.target }}
-
       - name: Tauri Build
         uses: tauri-apps/tauri-action@v0
         env:
@@ -78,14 +73,102 @@ jobs:
           tagName: v__VERSION__
           releaseName: "Clash Verge Rev v__VERSION__ me"
           releaseBody: "A customized version for personal use that follows the main branch."
-          releaseDraft: false
+          releaseDraft: true
           prerelease: false
           tauriScript: pnpm
           args: --target ${{ matrix.target }}
+          
+      - uses: actions/upload-artifact@v1
+        if: matrix.target == 'aarch64-pc-windows-msvc'
+        with:
+          name: Windows_Dist_ARM64
+          path: src-tauri/target/${{ matrix.target }}/release/bundle/nsis/
+
+      - uses: actions/upload-artifact@v1
+        if: matrix.target == 'x86_64-pc-windows-msvc'
+        with:
+          name: Windows_Dist_X86_64
+          path: src-tauri/target/${{ matrix.target }}/release/bundle/nsis/
+          
+  release-mac:
+    name: MacOS
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            target: aarch64-apple-darwin
+          - os: macos-latest
+            target: x86_64-apple-darwin
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Apply Patch
+        if: matrix.target == 'aarch64-pc-windows-msvc'
+        run: |
+          git config --global user.email "rayfish2020@gmail.com"
+          git config --global user.name "raymao9"
+          git am patches/support-windows-aarch64.patch
+      - name: Init Submodule
+        if: matrix.target == 'aarch64-pc-windows-msvc'
+        run: git submodule update --init --recursive
+
+      - name: Install Rust Stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Add Rust Target
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        with:
+          version: 8
+          run_install: false
+
+      - name: Pnpm install and check
+        run: |
+          pnpm i
+          pnpm check ${{ matrix.target }}
+          
+      - name: Tauri Build
+        run: |
+          export TAURI_PRIVATE_KEY="${{ secrets.TAURI_PRIVATE_KEY }}"
+          export TAURI_KEY_PASSWORD="${{ secrets.TAURI_KEY_PASSWORD }}"
+          pnpm build --target ${{ matrix.target }}
+          
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+
+      - uses: actions/upload-artifact@v1
+        if: matrix.target == 'aarch64-apple-darwin'
+        with:
+          name: MacOS_Dist_ARM64
+          path: src-tauri/target/${{ matrix.target }}/release/bundle/dmg/
+
+      - uses: actions/upload-artifact@v1
+        if: matrix.target == 'x86_64-apple-darwin'
+        with:
+          name: MacOS_Dist_X86_64
+          path: src-tauri/target/${{ matrix.target }}/release/bundle/dmg/
 
   release-update:
     runs-on: ubuntu-latest
-    needs: [release]
+    needs: [release-windows, release-mac]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -108,3 +191,27 @@ jobs:
         run: pnpm updater
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download pre-built packages for Windows ARM64
+        uses: actions/download-artifact@v1
+        with:
+          name: Windows_Dist_ARM64
+          path: artifacts
+
+      - name: Download pre-built packages for Windows X86_64
+        uses: actions/download-artifact@v1
+        with:
+          name: Windows_Dist_X86_64
+          path: artifacts
+          
+      - name: Download pre-built packages for MacOS ARM64
+        uses: actions/download-artifact@v1
+        with:
+          name: MacOS_Dist_ARM64
+          path: artifacts
+
+      - name: Download pre-built packages for MacOS X86_64
+        uses: actions/download-artifact@v1
+        with:
+          name: MacOS_Dist_X86_64
+          path: artifacts
