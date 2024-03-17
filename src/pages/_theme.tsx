@@ -4,7 +4,7 @@ const OS = getSystem();
 // default theme setting
 export const defaultTheme = {
   primary_color: "#007AFF",
-  secondary_color: "#FFCC00",
+  secondary_color: "#fc9b76",
   primary_text: "#000000",
   secondary_text: "#3c3c4399",
   info_color: "#007AFF",
@@ -12,8 +12,8 @@ export const defaultTheme = {
   warning_color: "#FF9500",
   success_color: "#06943D",
   background_color: "#f5f5f5",
-  font_family: `-apple-system, BlinkMacSystemFont,"Microsoft YaHei UI", "Microsoft YaHei", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", ${
-    OS === "windows" ? "twemoji mozilla" : ""
+  font_family: `-apple-system, BlinkMacSystemFont,"Microsoft YaHei UI", "Microsoft YaHei", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji"${
+    OS === "windows" ? ", twemoji mozilla" : ""
   }`,
 };
 

@@ -122,9 +122,17 @@ const Layout = () => {
             ({ palette }) => ({
               bgcolor: palette.background.paper,
             }),
+            OS === "linux"
+              ? {
+                  borderRadius: "8px",
+                  border: "2px solid var(--divider-color)",
+                  width: "calc(100vw - 4px)",
+                  height: "calc(100vh - 4px)",
+                }
+              : {},
           ]}
         >
-          <div className="layout__left" data-tauri-drag-region="true">
+          <div className="layout__left">
             <div className="the-logo" data-tauri-drag-region="true">
               {!isDark ? <LogoSvg /> : <LogoSvg_dark />}
             </div>
@@ -147,11 +155,16 @@ const Layout = () => {
           </div>
 
           <div className="layout__right">
-            {OS === "windows" && (
-              <div className="the-bar" data-tauri-drag-region="true">
-                <LayoutControl />
+            {
+              <div className="the-bar">
+                <div
+                  className="the-dragbar"
+                  data-tauri-drag-region="true"
+                  style={{ width: "100%" }}
+                ></div>
+                {OS !== "macos" && <LayoutControl />}
               </div>
-            )}
+            }
 
             <TransitionGroup className="the-content">
               <CSSTransition
