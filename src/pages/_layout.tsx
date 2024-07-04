@@ -88,8 +88,8 @@ const Layout = () => {
 
   useEffect(() => {
     if (language) {
-      dayjs.locale(language === "tw" ? "zh-tw" : language);
       dayjs.locale(language === "cn" ? "zh-cn" : language);
+      dayjs.locale(language === "tw" ? "zh-tw" : language);
       i18next.changeLanguage(language);
     }
     if (start_page) {
