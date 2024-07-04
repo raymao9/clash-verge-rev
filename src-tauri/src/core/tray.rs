@@ -14,17 +14,17 @@ pub struct Tray {}
 
 impl Tray {
     pub fn tray_menu(app_handle: &AppHandle) -> SystemTrayMenu {
-        let tw = { Config::verge().latest().language == Some("tw".into()) };
 	let cn = { Config::verge().latest().language == Some("cn".into()) };
+        let tw = { Config::verge().latest().language == Some("tw".into()) };
         let version = app_handle.package_info().version.to_string();
 
         macro_rules! t {
-            ($tw: expr, $cn: expr, $en: expr) => {
-                if tw {
-                    $tw
+            ($cn: expr, $tw: expr, $en: expr) => {
+                if cn {
+                    $cn
                 } else {
-		    if cn {
-			$cn
+		    if tw {
+			$tw
 		    } else {
 		    	$en
 		    }
@@ -35,12 +35,12 @@ impl Tray {
         SystemTrayMenu::new()
             .add_item(CustomMenuItem::new(
                 "open_window",
-                t!("打開主視窗", "显示主窗口", "Dashboard"),
+                t!("显示主窗口", "打開主視窗", "Dashboard"),
             ))
             .add_native_item(SystemTrayMenuItem::Separator)
             .add_item(CustomMenuItem::new(
                 "rule_mode",
-                t!("分流模式", "规则模式", "Rule Mode"),
+                t!("规则模式","分流模式", "Rule Mode"),
             ))
             .add_item(CustomMenuItem::new(
                 "global_mode",
@@ -48,51 +48,51 @@ impl Tray {
             ))
             .add_item(CustomMenuItem::new(
                 "direct_mode",
-                t!("直連模式", "直连模式", "Direct Mode"),
+                t!("直连模式", "直連模式", "Direct Mode"),
             ))
             .add_native_item(SystemTrayMenuItem::Separator)
             .add_item(CustomMenuItem::new(
                 "system_proxy",
-                t!("啟用系統代理", "打开系统代理", "System Proxy"),
+                t!("打开系统代理", "啟用系統代理", "System Proxy"),
             ))
-            .add_item(CustomMenuItem::new("tun_mode", t!("啟用 Tun 模式", "打开 Tun 模式", "TUN Mode")))
+            .add_item(CustomMenuItem::new("tun_mode", t!("打开 Tun 模式", "啟用 Tun 模式",  "TUN Mode")))
             .add_item(CustomMenuItem::new(
                 "copy_env",
-                t!("複製終端機代理指令", "复制环境变量", "Copy Env"),
+                t!("复制环境变量", "複製終端機代理指令", "Copy Env"),
             ))
             .add_submenu(SystemTraySubmenu::new(
-                t!("打開檔案位置", "打开目录", "Open Dir"),
+                t!("打开目录", "打開檔案位置", "Open Dir"),
                 SystemTrayMenu::new()
                     .add_item(CustomMenuItem::new(
                         "open_logs_dir",
-                        t!("連線記錄所在位置", "日志目录", "Logs Dir"),
+                        t!("日志目录", "連線記錄所在位置", "Logs Dir"),
                     ))
                     .add_item(CustomMenuItem::new(
                         "open_app_dir",
-                        t!("應用程式所在位置", "应用目录", "App Dir"),
+                        t!("应用目录", "應用程式所在位置", "App Dir"),
                     ))
                     .add_item(CustomMenuItem::new(
                         "open_core_dir",
-                        t!("Clash 核心所在位置", "内核目录", "Core Dir"),
+                        t!("内核目录", "Clash 核心所在位置", "Core Dir"),
                     )),
             ))
             .add_submenu(SystemTraySubmenu::new(
-                t!("更多功能", "更多", "More"),
+                t!("更多", "更多功能", "More"),
                 SystemTrayMenu::new()
                     .add_item(CustomMenuItem::new(
                         "restart_clash",
-                        t!("重啟 Clash", "重启 Clash", "Restart Clash"),
+                        t!("重启 Clash", "重啟 Clash", "Restart Clash"),
                     ))
                     .add_item(CustomMenuItem::new(
                         "restart_app",
-                        t!("重啟 APP", "重启 APP", "Restart App"),
+                        t!("重启 APP", "重啟 APP", "Restart App"),
                     ))
                     .add_item(
                         CustomMenuItem::new("app_version", format!("Version {version}")).disabled(),
                     ),
             ))
             .add_native_item(SystemTrayMenuItem::Separator)
-            .add_item(CustomMenuItem::new("quit", t!("結束", "退出", "Quit")).accelerator("CmdOrControl+Q"))
+            .add_item(CustomMenuItem::new("quit", t!("退出", "結束", "Quit")).accelerator("CmdOrControl+Q"))
     }
 
     pub fn update_systray(app_handle: &AppHandle) -> Result<()> {
@@ -104,18 +104,18 @@ impl Tray {
     }
 
     pub fn update_part(app_handle: &AppHandle) -> Result<()> {
-        let tw = { Config::verge().latest().language == Some("tw".into()) };
 	let cn = { Config::verge().latest().language == Some("cn".into()) };
+       	let tw = { Config::verge().latest().language == Some("tw".into()) };
 
         let version = app_handle.package_info().version.to_string();
 
         macro_rules! t {
-            ($tw: expr, $cn: expr, $en: expr) => {
-                if tw {
-                    $tw
+            ($cn: expr, $tw: expr, $en: expr) => {
+                if cn {
+                    $cn
                 } else {
-		    if cn {
-			$cn
+		    if tw {
+			$tw
 		    } else {
 		    	$en
 		    }
@@ -201,7 +201,7 @@ impl Tray {
 
         let _ = tray.set_tooltip(&format!(
             "Clash Verge {version}\n{}: {}\n{}: {}",
-            t!("系統代理", "系统代理", "System Proxy"),
+            t!("系统代理", "系統代理", "System Proxy"),
             switch_map[system_proxy],
             t!("Tun 模式", "Tun 模式", "TUN Mode"),
             switch_map[tun_mode]

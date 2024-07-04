@@ -3,7 +3,7 @@ name: Me
 on:
   workflow_dispatch:
   push:
-    branches: [me]
+    branches: [me, me_cn]
     tags: [me]
 permissions: write-all
 env:
@@ -53,7 +53,7 @@ jobs:
         with:
           node-version: "20"
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
           version: 8
@@ -132,10 +132,10 @@ jobs:
         with:
           node-version: "20"
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 8
+          version: 8  
           run_install: false
 
       - name: Pnpm install and check
@@ -178,7 +178,7 @@ jobs:
         with:
           node-version: "20"
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
           version: 8
