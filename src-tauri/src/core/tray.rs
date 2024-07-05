@@ -19,7 +19,7 @@ impl Tray {
         let version = app_handle.package_info().version.to_string();
 
         macro_rules! t {
-            ($tw: expr, $cn: expr, $en: expr) => {
+            ($cn: expr, $tw: expr, $en: expr) => {
                 if cn {
                     $cn
                 } else {
@@ -55,7 +55,7 @@ impl Tray {
                 "system_proxy",
                 t!("打开系统代理", "啟用系統代理", "System Proxy"),
             ))
-            .add_item(CustomMenuItem::new("tun_mode", t!("啟用 Tun 模式", "打开 Tun 模式", "TUN Mode")))
+            .add_item(CustomMenuItem::new("tun_mode", t!("打开 Tun 模式", "啟用 Tun 模式",  "TUN Mode")))
             .add_item(CustomMenuItem::new(
                 "copy_env",
                 t!("复制环境变量", "複製終端機代理指令", "Copy Env"),
@@ -104,13 +104,13 @@ impl Tray {
     }
 
     pub fn update_part(app_handle: &AppHandle) -> Result<()> {
-        let tw = { Config::verge().latest().language == Some("tw".into()) };
 	let cn = { Config::verge().latest().language == Some("cn".into()) };
+       	let tw = { Config::verge().latest().language == Some("tw".into()) };
 
         let version = app_handle.package_info().version.to_string();
 
         macro_rules! t {
-            ($tw: expr, $cn: expr, $en: expr) => {
+            ($cn: expr, $tw: expr, $en: expr) => {
                 if cn {
                     $cn
                 } else {
