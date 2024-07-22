@@ -3,7 +3,7 @@ name: Me
 on:
   workflow_dispatch:
   push:
-    branches: [me]
+    branches: [me, me_cn]
     tags: [me]
 permissions: write-all
 env:
