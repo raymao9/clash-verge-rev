@@ -3,7 +3,7 @@ name: Me
 on:
   workflow_dispatch:
   push:
-    branches: [me, me_cn]
+    branches: [me]
     tags: [me]
 permissions: write-all
 env:
@@ -27,6 +27,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Init Submodule
+        if: matrix.target == 'aarch64-pc-windows-msvc'
+        run: git submodule update --init --recursive
+
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@stable
 
@@ -43,7 +47,7 @@ jobs:
         with:
           node-version: "20"
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v2
         name: Install pnpm
         with:
           version: 8
@@ -122,10 +126,10 @@ jobs:
         with:
           node-version: "20"
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v2
         name: Install pnpm
         with:
-          version: 8  
+          version: 8
           run_install: false
 
       - name: Pnpm install and check
@@ -168,7 +172,7 @@ jobs:
         with:
           node-version: "20"
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v2
         name: Install pnpm
         with:
           version: 8
