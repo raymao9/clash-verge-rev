@@ -107,6 +107,8 @@ pub async fn patch_clash(patch: Mapping) -> Result<()> {
     Config::clash().draft().patch_config(patch.clone());
 
     match {
+        let redir_port = patch.get("redir-port");
+        let tproxy_port = patch.get("tproxy-port");
         let mixed_port = patch.get("mixed-port");
         let socks_port = patch.get("socks-port");
         let port = patch.get("port");
@@ -129,7 +131,9 @@ pub async fn patch_clash(patch: Mapping) -> Result<()> {
         };
 
         // 激活订阅
-        if mixed_port.is_some()
+        if redir_port.is_some()
+            || tproxy_port.is_some()
+            || mixed_port.is_some()
             || socks_port.is_some()
             || port.is_some()
             || patch.get("secret").is_some()
@@ -173,37 +177,56 @@ pub async fn patch_verge(patch: IVerge) -> Result<()> {
     let tun_mode = patch.enable_tun_mode;
     let auto_launch = patch.enable_auto_launch;
     let system_proxy = patch.enable_system_proxy;
+    let pac = patch.proxy_auto_config;
+    let pac_content = patch.pac_file_content;
     let proxy_bypass = patch.system_proxy_bypass;
     let language = patch.language;
     let port = patch.verge_mixed_port;
+    #[cfg(target_os = "macos")]
+    let tray_icon = patch.tray_icon;
     let common_tray_icon = patch.common_tray_icon;
     let sysproxy_tray_icon = patch.sysproxy_tray_icon;
     let tun_tray_icon = patch.tun_tray_icon;
-
+    #[cfg(not(target_os = "windows"))]
+    let redir_enabled = patch.verge_redir_enabled;
+    #[cfg(target_os = "linux")]
+    let tproxy_enabled = patch.verge_tproxy_enabled;
+    let socks_enabled = patch.verge_socks_enabled;
+    let http_enabled = patch.verge_http_enabled;
     match {
-        #[cfg(target_os = "windows")]
-        {
-            let service_mode = patch.enable_service_mode;
+        let service_mode = patch.enable_service_mode;
 
-            if service_mode.is_some() {
-                log::debug!(target: "app", "change service mode to {}", service_mode.unwrap());
+        if service_mode.is_some() {
+            log::debug!(target: "app", "change service mode to {}", service_mode.unwrap());
 
-                Config::generate()?;
-                CoreManager::global().run_core().await?;
-            } else if tun_mode.is_some() {
-                update_core_config().await?;
-            }
-        }
-
-        #[cfg(not(target_os = "windows"))]
-        if tun_mode.is_some() {
+            Config::generate()?;
+            CoreManager::global().run_core().await?;
+        } else if tun_mode.is_some() {
             update_core_config().await?;
         }
-
+        #[cfg(not(target_os = "windows"))]
+        if redir_enabled.is_some() {
+            Config::generate()?;
+            CoreManager::global().run_core().await?;
+        }
+        #[cfg(target_os = "linux")]
+        if tproxy_enabled.is_some() {
+            Config::generate()?;
+            CoreManager::global().run_core().await?;
+        }
+        if socks_enabled.is_some() || http_enabled.is_some() {
+            Config::generate()?;
+            CoreManager::global().run_core().await?;
+        }
         if auto_launch.is_some() {
             sysopt::Sysopt::global().update_launch()?;
         }
-        if system_proxy.is_some() || proxy_bypass.is_some() || port.is_some() {
+        if system_proxy.is_some()
+            || proxy_bypass.is_some()
+            || port.is_some()
+            || pac.is_some()
+            || pac_content.is_some()
+        {
             sysopt::Sysopt::global().update_sysproxy()?;
             sysopt::Sysopt::global().guard_proxy();
         }
@@ -224,6 +247,10 @@ pub async fn patch_verge(patch: IVerge) -> Result<()> {
             || sysproxy_tray_icon.is_some()
             || tun_tray_icon.is_some()
         {
+            handle::Handle::update_systray_part()?;
+        }
+        #[cfg(target_os = "macos")]
+        if tray_icon.is_some() {
             handle::Handle::update_systray_part()?;
         }
 
@@ -303,7 +330,7 @@ pub fn copy_clash_env(app_handle: &AppHandle) {
 
     let sh =
         format!("export https_proxy={http_proxy} http_proxy={http_proxy} all_proxy={socks5_proxy}");
-    let cmd: String = format!("set http_proxy={http_proxy} \n set https_proxy={http_proxy}");
+    let cmd: String = format!("set http_proxy={http_proxy}\r\nset https_proxy={http_proxy}");
     let ps: String = format!("$env:HTTP_PROXY=\"{http_proxy}\"; $env:HTTPS_PROXY=\"{http_proxy}\"");
 
     let mut cliboard = app_handle.clipboard_manager();

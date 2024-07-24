@@ -33,7 +33,7 @@ import { LayoutViewer } from "./mods/layout-viewer";
 import { UpdateViewer } from "./mods/update-viewer";
 import getSystem from "@/utils/get-system";
 import { routers } from "@/pages/_routers";
-import { appWindow } from "@tauri-apps/api/window";
+
 interface Props {
   onError?: (err: Error) => void;
 }
@@ -67,7 +67,7 @@ const SettingVerge = ({ onError }: Props) => {
     try {
       const info = await checkUpdate();
       if (!info?.shouldUpdate) {
-        Notice.success("No Updates Available");
+        Notice.success(t("Currently on the Latest Version"));
       } else {
         updateRef.current?.open();
       }
@@ -112,6 +112,25 @@ const SettingVerge = ({ onError }: Props) => {
         </GuardState>
       </SettingItem>
 
+      {OS !== "linux" && (
+        <SettingItem label={t("Tray Click Event")}>
+          <GuardState
+            value={tray_event ?? "main_window"}
+            onCatch={onError}
+            onFormat={(e: any) => e.target.value}
+            onChange={(e) => onChangeData({ tray_event: e })}
+            onGuard={(e) => patchVerge({ tray_event: e })}
+          >
+            <Select size="small" sx={{ width: 140, "> div": { py: "7.5px" } }}>
+              <MenuItem value="main_window">{t("Show Main Window")}</MenuItem>
+              <MenuItem value="system_proxy">{t("System Proxy")}</MenuItem>
+              <MenuItem value="tun_mode">{t("Tun Mode")}</MenuItem>
+              <MenuItem value="disable">{t("Disable")}</MenuItem>
+            </Select>
+          </GuardState>
+        </SettingItem>
+      )}
+
       <SettingItem label={t("Copy Env Type")}>
         <GuardState
           value={env_type ?? (OS === "windows" ? "powershell" : "bash")}
@@ -137,8 +156,8 @@ const SettingVerge = ({ onError }: Props) => {
           onGuard={(e) => patchVerge({ start_page: e })}
         >
           <Select size="small" sx={{ width: 140, "> div": { py: "7.5px" } }}>
-            {routers.map((page: { label: string; link: string }) => {
-              return <MenuItem value={page.link}>{t(page.label)}</MenuItem>;
+            {routers.map((page: { label: string; path: string }) => {
+              return <MenuItem value={page.path}>{t(page.label)}</MenuItem>;
             })}
           </Select>
         </GuardState>
@@ -248,36 +267,6 @@ const SettingVerge = ({ onError }: Props) => {
         </IconButton>
       </SettingItem>
 
-      {OS !== "linux" && (
-        <SettingItem label={t("Tray Click Event")}>
-          <GuardState
-            value={tray_event ?? "main_window"}
-            onCatch={onError}
-            onFormat={(e: any) => e.target.value}
-            onChange={(e) => onChangeData({ tray_event: e })}
-            onGuard={(e) => patchVerge({ tray_event: e })}
-          >
-            <Select size="small" sx={{ width: 160, "> div": { py: "7.5px" } }}>
-              <MenuItem value="main_window">{t("Show Main Window")}</MenuItem>
-              <MenuItem value="system_proxy">{t("System Proxy")}</MenuItem>
-              <MenuItem value="tun_mode">{t("Tun Mode")}</MenuItem>
-              <MenuItem value="disable">{t("Disable")}</MenuItem>
-            </Select>
-          </GuardState>
-        </SettingItem>
-      )}
-
-      <SettingItem label={t("Open Logs Dir")}>
-        <IconButton
-          color="inherit"
-          size="small"
-          sx={{ my: "2px" }}
-          onClick={openLogsDir}
-        >
-          <ArrowForward />
-        </IconButton>
-      </SettingItem>
-
       <SettingItem label={t("Open App Dir")}>
         <IconButton
           color="inherit"
@@ -295,6 +284,17 @@ const SettingVerge = ({ onError }: Props) => {
           size="small"
           sx={{ my: "2px" }}
           onClick={openCoreDir}
+        >
+          <ArrowForward />
+        </IconButton>
+      </SettingItem>
+
+      <SettingItem label={t("Open Logs Dir")}>
+        <IconButton
+          color="inherit"
+          size="small"
+          sx={{ my: "2px" }}
+          onClick={openLogsDir}
         >
           <ArrowForward />
         </IconButton>

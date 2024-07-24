@@ -4,9 +4,8 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { SWRConfig, mutate } from "swr";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Route, Routes, useLocation } from "react-router-dom";
-import { CSSTransition, TransitionGroup } from "react-transition-group";
-import { alpha, List, Paper, ThemeProvider } from "@mui/material";
+import { useLocation, useRoutes } from "react-router-dom";
+import { List, Paper, ThemeProvider, SvgIcon } from "@mui/material";
 import { listen } from "@tauri-apps/api/event";
 import { appWindow } from "@tauri-apps/api/window";
 import { routers } from "./_routers";
@@ -14,18 +13,23 @@ import { getAxios } from "@/services/api";
 import { useVerge } from "@/hooks/use-verge";
 import LogoSvg from "@/assets/image/logo.svg?react";
 import LogoSvg_dark from "@/assets/image/logo_dark.svg?react";
+import iconLight from "@/assets/image/icon_light.svg?react";
+import iconDark from "@/assets/image/icon_dark.svg?react";
 import { atomThemeMode } from "@/services/states";
 import { useRecoilState } from "recoil";
-import { BaseErrorBoundary, Notice } from "@/components/base";
+import { Notice } from "@/components/base";
 import { LayoutItem } from "@/components/layout/layout-item";
 import { LayoutControl } from "@/components/layout/layout-control";
 import { LayoutTraffic } from "@/components/layout/layout-traffic";
 import { useCustomTheme } from "@/components/layout/use-custom-theme";
 import getSystem from "@/utils/get-system";
-import "dayjs/locale/zh-cn";
+import "dayjs/locale/ru";
 import "dayjs/locale/zh-tw";
+import "dayjs/locale/zh-cn";
 import { getPortableFlag } from "@/services/cmds";
 import { useNavigate } from "react-router-dom";
+import React from "react";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
 export let portableFlag = false;
 
 dayjs.extend(relativeTime);
@@ -42,6 +46,8 @@ const Layout = () => {
   const { language, start_page } = verge || {};
   const navigate = useNavigate();
   const location = useLocation();
+  const routersEles = useRoutes(routers);
+  if (!routersEles) return null;
 
   useEffect(() => {
     window.addEventListener("keydown", (e) => {
@@ -68,7 +74,7 @@ const Layout = () => {
       const [status, msg] = payload as [string, string];
       switch (status) {
         case "set_config::ok":
-          Notice.success("Refresh clash config");
+          Notice.success(t("Clash Config Updated"));
           break;
         case "set_config::error":
           Notice.error(msg);
@@ -141,7 +147,7 @@ const Layout = () => {
               {routers.map((router) => (
                 <LayoutItem
                   key={router.label}
-                  to={router.link}
+                  to={router.path}
                   icon={router.icon}
                 >
                   {t(router.label)}
@@ -172,19 +178,7 @@ const Layout = () => {
                 timeout={300}
                 classNames="page"
               >
-                <Routes>
-                  {routers.map(({ label, link, ele: Ele }) => (
-                    <Route
-                      key={label}
-                      path={link}
-                      element={
-                        <BaseErrorBoundary key={label}>
-                          <Ele />
-                        </BaseErrorBoundary>
-                      }
-                    />
-                  ))}
-                </Routes>
+                {React.cloneElement(routersEles, { key: location.pathname })}
               </CSSTransition>
             </TransitionGroup>
           </div>

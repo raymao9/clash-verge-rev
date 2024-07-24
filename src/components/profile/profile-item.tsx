@@ -20,10 +20,11 @@ import { RefreshRounded, DragIndicator } from "@mui/icons-material";
 import { atomLoadingCache } from "@/services/states";
 import { updateProfile, deleteProfile, viewProfile } from "@/services/cmds";
 import { Notice } from "@/components/base";
-import { EditorViewer } from "./editor-viewer";
+import { EditorViewer } from "@/components/profile/editor-viewer";
 import { ProfileBox } from "./profile-box";
 import parseTraffic from "@/utils/parse-traffic";
-
+import { ConfirmViewer } from "./confirm-viewer";
+import { open } from "@tauri-apps/api/shell";
 const round = keyframes`
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -54,6 +55,7 @@ export const ProfileItem = (props: Props) => {
   // remote file mode
   const hasUrl = !!itemData.url;
   const hasExtra = !!extra; // only subscription url has extra info
+  const hasHome = !!itemData.home; // only subscription url has home page
 
   const { upload = 0, download = 0, total = 0 } = extra ?? {};
   const from = parseUrl(itemData.url);
@@ -92,6 +94,12 @@ export const ProfileItem = (props: Props) => {
   }, [hasUrl, updated]);
 
   const [fileOpen, setFileOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const onOpenHome = () => {
+    setAnchorEl(null);
+    open(itemData.home ?? "");
+  };
 
   const onEditInfo = () => {
     setAnchorEl(null);
@@ -164,21 +172,35 @@ export const ProfileItem = (props: Props) => {
     }
   });
 
-  const urlModeMenu = [
+  const urlModeMenu = (
+    hasHome ? [{ label: "Home", handler: onOpenHome }] : []
+  ).concat([
     { label: "Select", handler: onForceSelect },
     { label: "Edit Info", handler: onEditInfo },
     { label: "Edit File", handler: onEditFile },
     { label: "Open File", handler: onOpenFile },
     { label: "Update", handler: () => onUpdate(0) },
     { label: "Update(Proxy)", handler: () => onUpdate(2) },
-    { label: "Delete", handler: onDelete },
-  ];
+    {
+      label: "Delete",
+      handler: () => {
+        setAnchorEl(null);
+        setConfirmOpen(true);
+      },
+    },
+  ]);
   const fileModeMenu = [
     { label: "Select", handler: onForceSelect },
     { label: "Edit Info", handler: onEditInfo },
     { label: "Edit File", handler: onEditFile },
     { label: "Open File", handler: onOpenFile },
-    { label: "Delete", handler: onDelete },
+    {
+      label: "Delete",
+      handler: () => {
+        setAnchorEl(null);
+        setConfirmOpen(true);
+      },
+    },
   ];
 
   const boxStyle = {
@@ -341,7 +363,19 @@ export const ProfileItem = (props: Props) => {
           <MenuItem
             key={item.label}
             onClick={item.handler}
-            sx={{ minWidth: 120 }}
+            sx={[
+              {
+                minWidth: 120,
+              },
+              (theme) => {
+                return {
+                  color:
+                    item.label === "Delete"
+                      ? theme.palette.error.main
+                      : undefined,
+                };
+              },
+            ]}
             dense
           >
             {t(item.label)}
@@ -350,10 +384,22 @@ export const ProfileItem = (props: Props) => {
       </Menu>
 
       <EditorViewer
-        uid={uid}
+        mode="profile"
+        property={uid}
         open={fileOpen}
-        mode="yaml"
+        language="yaml"
+        schema="clash"
         onClose={() => setFileOpen(false)}
+      />
+      <ConfirmViewer
+        title="Confirm deletion"
+        message="This operation is not reversible"
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={() => {
+          onDelete();
+          setConfirmOpen(false);
+        }}
       />
     </Box>
   );

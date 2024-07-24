@@ -127,6 +127,13 @@ export async function getSystemProxy() {
   }>("get_sys_proxy");
 }
 
+export async function getAutotemProxy() {
+  return invoke<{
+    enable: boolean;
+    url: string;
+  }>("get_auto_proxy");
+}
+
 export async function changeClashCore(clashCore: string) {
   return invoke<any>("change_clash_core", { clashCore });
 }
@@ -223,7 +230,7 @@ export async function exitApp() {
 
 export async function copyIconFile(
   path: string,
-  name: "common.png" | "sysproxy.png" | "tun.png"
+  name: "common" | "sysproxy" | "tun"
 ) {
   return invoke<void>("copy_icon_file", { path, name });
 }
