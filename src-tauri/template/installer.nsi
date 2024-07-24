@@ -13,8 +13,9 @@ Unicode true
 !include FileFunc.nsh
 !include x64.nsh
 !include WordFunc.nsh
-!include "LogicLib.nsh"
 !include "StrFunc.nsh"
+!include "Win\COM.nsh"
+!include "Win\Propkey.nsh"
 !addplugindir "$%AppData%\Local\NSIS\"
 ${StrCase}
 ${StrLoc}
@@ -149,7 +150,6 @@ Function PageReinstall
   ; however, this should be fine since the user will have to confirm the uninstallation
   ; and they can chose to abort it if doesn't make sense.
   StrCpy $0 0
-
   wix_loop:
     EnumRegKey $1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" $0
     StrCmp $1 "" wix_done ; Exit loop if there is no more keys to loop on
@@ -420,55 +420,53 @@ Function .onInit
 FunctionEnd
 
 !macro CheckAllVergeProcesses
-    ; Check if Clash Verge.exe is running
-    nsis_tauri_utils::FindProcess "Clash Verge.exe"
-    ${If} $R0 != 0
-        ; Kill the process
-        DetailPrint "Kill Clash Verge.exe..."
-        !if "${INSTALLMODE}" == "currentUser"
-            nsis_tauri_utils::KillProcessCurrentUser "Clash Verge.exe"
-        !else
-            nsis_tauri_utils::KillProcess "Clash Verge.exe"
-        !endif
-    ${EndIf}
-
-    
-    ; Check if clash-verge-service.exe is running
+  ; Check if clash-verge-service.exe is running
+  !if "${INSTALLMODE}" == "currentUser"
+    nsis_tauri_utils::FindProcessCurrentUser "clash-verge-service.exe"
+  !else
     nsis_tauri_utils::FindProcess "clash-verge-service.exe"
-    ${If} $R0 != 0
-        ; Kill the process
-        DetailPrint "Kill clash-verge-service.exe..."
-        !if "${INSTALLMODE}" == "currentUser"
-            nsis_tauri_utils::KillProcessCurrentUser "clash-verge-service.exe"
-        !else
-            nsis_tauri_utils::KillProcess "clash-verge-service.exe"
-        !endif
-    ${EndIf}
+  !endif
+  Pop $R0
+  ${If} $R0 = 0
+    DetailPrint "Kill clash-verge-service.exe..."
+    !if "${INSTALLMODE}" == "currentUser"
+      nsis_tauri_utils::KillProcessCurrentUser "clash-verge-service.exe"
+    !else
+      nsis_tauri_utils::KillProcess "clash-verge-service.exe"
+    !endif
+  ${EndIf}
 
-       
-    ; Check if clash-meta-alpha.exe is running
+  ; Check if clash-meta-alpha.exe is running
+  !if "${INSTALLMODE}" == "currentUser"
+    nsis_tauri_utils::FindProcessCurrentUser "clash-meta-alpha.exe"
+  !else
     nsis_tauri_utils::FindProcess "clash-meta-alpha.exe"
-    ${If} $R0 != 0
-        ; Kill the process
-        DetailPrint "Kill clash-meta-alpha.exe..."
-        !if "${INSTALLMODE}" == "currentUser"
-            nsis_tauri_utils::KillProcessCurrentUser "clash-meta-alpha.exe"
-        !else
-            nsis_tauri_utils::KillProcess "clash-meta-alpha.exe"
-        !endif
-    ${EndIf}
+  !endif
+  Pop $R0
+  ${If} $R0 = 0
+    DetailPrint "Kill clash-meta-alpha.exe..."
+    !if "${INSTALLMODE}" == "currentUser"
+      nsis_tauri_utils::KillProcessCurrentUser "clash-meta-alpha.exe"
+    !else
+      nsis_tauri_utils::KillProcess "clash-meta-alpha.exe"
+    !endif
+  ${EndIf}
 
-    ; Check if clash-meta.exe is running
+  ; Check if clash-meta.exe is running
+  !if "${INSTALLMODE}" == "currentUser"
+    nsis_tauri_utils::FindProcessCurrentUser "clash-meta.exe"
+  !else
     nsis_tauri_utils::FindProcess "clash-meta.exe"
-    ${If} $R0 != 0
-        ; Kill the process
-        DetailPrint "Kill clash-meta.exe..."
-        !if "${INSTALLMODE}" == "currentUser"
-            nsis_tauri_utils::KillProcessCurrentUser "clash-meta.exe"
-        !else
-            nsis_tauri_utils::KillProcess "clash-meta.exe"
-        !endif
-    ${EndIf}
+  !endif
+  Pop $R0
+  ${If} $R0 = 0
+    DetailPrint "Kill clash-meta.exe..."
+    !if "${INSTALLMODE}" == "currentUser"
+      nsis_tauri_utils::KillProcessCurrentUser "clash-meta.exe"
+    !else
+      nsis_tauri_utils::KillProcess "clash-meta.exe"
+    !endif
+  ${EndIf}
 !macroend
 
 !macro StartVergeService
@@ -571,7 +569,7 @@ Section WebView2
   !if "${INSTALLWEBVIEW2MODE}" == "downloadBootstrapper"
     Delete "$TEMP\MicrosoftEdgeWebview2Setup.exe"
     DetailPrint "$(webview2Downloading)"
-    nsis_tauri_utils::download "https://go.microsoft.com/fwlink/p/?LinkId=2124703" "$TEMP\MicrosoftEdgeWebview2Setup.exe"
+    NSISdl::download "https://go.microsoft.com/fwlink/p/?LinkId=2124703" "$TEMP\MicrosoftEdgeWebview2Setup.exe"
     Pop $0
     ${If} $0 == 0
       DetailPrint "$(webview2DownloadSuccess)"
@@ -730,7 +728,8 @@ Function .onInstSuccess
   check_r_flag:
     ${GetOptions} $CMDLINE "/R" $R0
     IfErrors run_done 0
-      Exec '"$INSTDIR\${MAINBINARYNAME}.exe"'
+      ${GetOptions} $CMDLINE "/ARGS" $R0
+      Exec '"$INSTDIR\${MAINBINARYNAME}.exe" $R0'
   run_done:
 FunctionEnd
 
@@ -744,6 +743,35 @@ Function un.onInit
   !insertmacro MUI_UNGETLANGUAGE
 FunctionEnd
 
+!macro DeleteAppUserModelId
+  !insertmacro ComHlpr_CreateInProcInstance ${CLSID_DestinationList} ${IID_ICustomDestinationList} r1 ""
+  ${If} $1 P<> 0
+    ${ICustomDestinationList::DeleteList} $1 '("${BUNDLEID}")'
+    ${IUnknown::Release} $1 ""
+  ${EndIf}
+  !insertmacro ComHlpr_CreateInProcInstance ${CLSID_ApplicationDestinations} ${IID_IApplicationDestinations} r1 ""
+  ${If} $1 P<> 0
+    ${IApplicationDestinations::SetAppID} $1 '("${BUNDLEID}")i.r0'
+    ${If} $0 >= 0
+      ${IApplicationDestinations::RemoveAllDestinations} $1 ''
+    ${EndIf}
+    ${IUnknown::Release} $1 ""
+  ${EndIf}
+!macroend
+
+; From https://stackoverflow.com/a/42816728/16993372
+!macro UnpinShortcut shortcut
+  !insertmacro ComHlpr_CreateInProcInstance ${CLSID_StartMenuPin} ${IID_IStartMenuPinnedList} r0 ""
+  ${If} $0 P<> 0
+      System::Call 'SHELL32::SHCreateItemFromParsingName(ws, p0, g "${IID_IShellItem}", *p0r1)' "${shortcut}"
+      ${If} $1 P<> 0
+          ${IStartMenuPinnedList::RemoveFromList} $0 '(r1)'
+          ${IUnknown::Release} $1 ""
+      ${EndIf}
+      ${IUnknown::Release} $0 ""
+  ${EndIf}
+!macroend
+
 Section Uninstall
   !insertmacro CheckIfAppIsRunning
   !insertmacro CheckAllVergeProcesses
@@ -756,7 +784,7 @@ Section Uninstall
   {{#each resources}}
     Delete "$INSTDIR\\{{this.[1]}}"
   {{/each}}
-
+  Delete "$INSTDIR\resources"
   ; Delete external binaries
   {{#each binaries}}
     Delete "$INSTDIR\\{{this}}"
@@ -765,14 +793,14 @@ Section Uninstall
   ; Delete uninstaller
   Delete "$INSTDIR\uninstall.exe"
 
-  ${If} $DeleteAppDataCheckboxState == 1
-    RMDir /R /REBOOTOK "$INSTDIR"
-  ${Else}
-    {{#each resources_ancestors}}
-    RMDir /REBOOTOK "$INSTDIR\\{{this}}"
-    {{/each}}
-    RMDir "$INSTDIR"
-  ${EndIf}
+  {{#each resources_ancestors}}
+  RMDir /REBOOTOK "$INSTDIR\\{{this}}"
+  {{/each}}
+  RMDir "$INSTDIR"
+
+  !insertmacro DeleteAppUserModelId
+  !insertmacro UnpinShortcut "$SMPROGRAMS\$AppStartMenuFolder\${MAINBINARYNAME}.lnk"
+  !insertmacro UnpinShortcut "$DESKTOP\${MAINBINARYNAME}.lnk"
 
   ; Remove start menu shortcut
   !insertmacro MUI_STARTMENU_GETFOLDER Application $AppStartMenuFolder
@@ -815,13 +843,39 @@ Function SkipIfPassive
   ${IfThen} $PassiveMode == 1  ${|} Abort ${|}
 FunctionEnd
 
+!macro SetLnkAppUserModelId shortcut
+  !insertmacro ComHlpr_CreateInProcInstance ${CLSID_ShellLink} ${IID_IShellLink} r0 ""
+  ${If} $0 P<> 0
+    ${IUnknown::QueryInterface} $0 '("${IID_IPersistFile}",.r1)'
+    ${If} $1 P<> 0
+      ${IPersistFile::Load} $1 '("${shortcut}", ${STGM_READWRITE})'
+      ${IUnknown::QueryInterface} $0 '("${IID_IPropertyStore}",.r2)'
+      ${If} $2 P<> 0
+        System::Call 'Oleaut32::SysAllocString(w "${BUNDLEID}") i.r3'
+        System::Call '*${SYSSTRUCT_PROPERTYKEY}(${PKEY_AppUserModel_ID})p.r4'
+        System::Call '*${SYSSTRUCT_PROPVARIANT}(${VT_BSTR},,&i4 $3)p.r5'
+        ${IPropertyStore::SetValue} $2 '($4,$5)'
+
+        System::Call 'Oleaut32::SysFreeString($3)'
+        System::Free $4
+        System::Free $5
+        ${IPropertyStore::Commit} $2 ""
+        ${IUnknown::Release} $2 ""
+        ${IPersistFile::Save} $1 '("${shortcut}",1)'
+      ${EndIf}
+      ${IUnknown::Release} $1 ""
+    ${EndIf}
+    ${IUnknown::Release} $0 ""
+  ${EndIf}
+!macroend
+
 Function CreateDesktopShortcut
   CreateShortcut "$DESKTOP\${MAINBINARYNAME}.lnk" "$INSTDIR\${MAINBINARYNAME}.exe"
-  ApplicationID::Set "$DESKTOP\${MAINBINARYNAME}.lnk" "${BUNDLEID}"
+  !insertmacro SetLnkAppUserModelId "$DESKTOP\${MAINBINARYNAME}.lnk"
 FunctionEnd
 
 Function CreateStartMenuShortcut
   CreateDirectory "$SMPROGRAMS\$AppStartMenuFolder"
   CreateShortcut "$SMPROGRAMS\$AppStartMenuFolder\${MAINBINARYNAME}.lnk" "$INSTDIR\${MAINBINARYNAME}.exe"
-  ApplicationID::Set "$SMPROGRAMS\$AppStartMenuFolder\${MAINBINARYNAME}.lnk" "${BUNDLEID}"
+  !insertmacro SetLnkAppUserModelId "$SMPROGRAMS\$AppStartMenuFolder\${MAINBINARYNAME}.lnk"
 FunctionEnd

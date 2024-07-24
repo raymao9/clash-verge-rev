@@ -64,6 +64,7 @@ interface IProxyItem {
   hidden?: boolean;
   icon?: string;
   provider?: string; // 记录是否来自provider
+  fixed?: string; // 记录固定(优先)的节点
 }
 
 type IProxyGroupItem = Omit<IProxyItem, "all"> & {
@@ -142,6 +143,8 @@ interface IClashInfo {
   // status: string;
   mixed_port?: number; // clash mixed port
   socks_port?: number; // clash socks port
+  redir_port?: number; // clash redir port
+  tproxy_port?: number; // clash tproxy port
   port?: number; // clash http port
   server?: string; // external-controller
   secret?: string;
@@ -166,6 +169,7 @@ interface IProfileItem {
     expire: number;
   };
   option?: IProfileOption;
+  home?: string;
 }
 
 interface IProfileOption {
@@ -203,6 +207,7 @@ interface IVergeConfig {
   enable_memory_usage?: boolean;
   enable_group_icon?: boolean;
   menu_icon?: "monochrome" | "colorful" | "disable";
+  tray_icon?: "monochrome" | "colorful";
   common_tray_icon?: boolean;
   sysproxy_tray_icon?: boolean;
   tun_tray_icon?: boolean;
@@ -211,10 +216,18 @@ interface IVergeConfig {
   enable_service_mode?: boolean;
   enable_silent_start?: boolean;
   enable_system_proxy?: boolean;
+  proxy_auto_config?: boolean;
+  pac_file_content?: string;
   enable_random_port?: boolean;
   verge_mixed_port?: number;
   verge_socks_port?: number;
+  verge_redir_port?: number;
+  verge_tproxy_port?: number;
   verge_port?: number;
+  verge_redir_enabled?: boolean;
+  verge_tproxy_enabled?: boolean;
+  verge_socks_enabled?: boolean;
+  verge_http_enabled?: boolean;
   enable_proxy_guard?: boolean;
   proxy_guard_duration?: number;
   system_proxy_bypass?: string;

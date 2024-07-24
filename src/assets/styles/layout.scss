@@ -28,7 +28,6 @@
     // $maxLogo: 100px;
 
     .the-logo {
-      app-region: drag;
       position: relative;
       flex: 1 0 58px;
       // width: 100%;
@@ -62,7 +61,7 @@
       .the-newbtn {
         position: absolute;
         right: 10px;
-        top: 0px;
+        top: 15px;
         border-radius: 8px;
         padding: 2px 4px;
         transform: scale(0.8);
@@ -81,7 +80,7 @@
 
       > div {
         margin: 0 auto;
-        padding: 0px 10px;
+        padding: 0px 20px;
       }
     }
   }
@@ -103,6 +102,7 @@
       box-sizing: border-box;
       z-index: 2;
       .the-dragbar {
+        margin-top: 5px;
         app-region: drag;
       }
     }
@@ -121,13 +121,17 @@
 .windows,
 .unknown {
   &.layout {
-    .layout__left {
-      // padding-top: 24px;
-    }
+    //.layout__left {
+    //  padding-top: 24px;
+    //}
 
     .layout__left .the-logo {
       flex: 1 0 58px;
-      padding-top: 40px;
+      margin-top: 10px;
+      margin-left: 10px;
+      padding-top: 30px;
+      padding-left: 10px;
+      padding-right: 20px;
       padding-bottom: 16px;
     }
 

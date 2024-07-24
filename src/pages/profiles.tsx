@@ -1,16 +1,8 @@
 import useSWR, { mutate } from "swr";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLockFn } from "ahooks";
 import { useSetRecoilState } from "recoil";
-import {
-  Box,
-  Button,
-  Grid,
-  IconButton,
-  Stack,
-  TextField,
-  Divider,
-} from "@mui/material";
+import { Box, Button, Grid, IconButton, Stack, Divider } from "@mui/material";
 import {
   DndContext,
   closestCenter,
@@ -41,6 +33,7 @@ import {
   deleteProfile,
   updateProfile,
   reorderProfile,
+  createProfile,
 } from "@/services/cmds";
 import { atomLoadingCache } from "@/services/states";
 import { closeAllConnections } from "@/services/api";
@@ -56,6 +49,10 @@ import { ConfigViewer } from "@/components/setting/mods/config-viewer";
 import { throttle } from "lodash-es";
 import { useRecoilState } from "recoil";
 import { atomThemeMode } from "@/services/states";
+import { BaseStyledTextField } from "@/components/base/base-styled-text-field";
+import { listen } from "@tauri-apps/api/event";
+import { readTextFile } from "@tauri-apps/api/fs";
+import { readText } from "@tauri-apps/api/clipboard";
 
 const ProfilePage = () => {
   const { t } = useTranslation();
@@ -70,6 +67,35 @@ const ProfilePage = () => {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  useEffect(() => {
+    const unlisten = listen("tauri://file-drop", async (event) => {
+      const fileList = event.payload as string[];
+      for (let file of fileList) {
+        if (!file.endsWith(".yaml") && !file.endsWith(".yml")) {
+          Notice.error(t("Only YAML Files Supported"));
+          continue;
+        }
+        const item = {
+          type: "local",
+          name: file.split(/\/|\\/).pop() ?? "New Profile",
+          desc: "",
+          url: "",
+          option: {
+            with_proxy: false,
+            self_proxy: false,
+          },
+        } as IProfileItem;
+        let data = await readTextFile(file);
+        await createProfile(item, data);
+        await mutateProfiles();
+      }
+    });
+    return () => {
+      unlisten.then((fn) => fn());
+    };
+  }, []);
+
   const {
     profiles = {},
     activateSelected,
@@ -111,7 +137,7 @@ const ProfilePage = () => {
 
     try {
       await importProfile(url);
-      Notice.success("Successfully import profile.");
+      Notice.success(t("Profile Imported Successfully"));
       setUrl("");
       setLoading(false);
 
@@ -154,7 +180,7 @@ const ProfilePage = () => {
       mutateLogs();
       closeAllConnections();
       setTimeout(() => activateSelected(), 2000);
-      Notice.success("Refresh clash config", 1000);
+      Notice.success(t("Profile Switched"), 1000);
     } catch (err: any) {
       Notice.error(err?.message || err.toString(), 4000);
     } finally {
@@ -167,7 +193,7 @@ const ProfilePage = () => {
     try {
       await enhanceProfiles();
       mutateLogs();
-      Notice.success("Refresh clash config", 1000);
+      Notice.success(t("Profile Reactivated"), 1000);
     } catch (err: any) {
       Notice.error(err.message || err.toString(), 3000);
     }
@@ -242,7 +268,7 @@ const ProfilePage = () => {
   });
 
   const onCopyLink = async () => {
-    const text = await navigator.clipboard.readText();
+    const text = await readText();
     if (text) setUrl(text);
   };
   const [mode] = useRecoilState(atomThemeMode);
@@ -299,16 +325,10 @@ const ProfilePage = () => {
           alignItems: "center",
         }}
       >
-        <TextField
-          hiddenLabel
-          fullWidth
-          size="small"
+        <BaseStyledTextField
           value={url}
           variant="outlined"
-          autoComplete="off"
-          spellCheck="false"
           onChange={(e) => setUrl(e.target.value)}
-          sx={{ input: { py: 0.65, px: 1.25 } }}
           placeholder={t("Profile URL")}
           InputProps={{
             sx: { pr: 1 },
