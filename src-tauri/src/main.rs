@@ -20,6 +20,9 @@ fn main() -> std::io::Result<()> {
         return Ok(());
     }
 
+    #[cfg(target_os = "linux")]
+    std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
+
     crate::log_err!(init::init_config());
 
     #[allow(unused_mut)]
@@ -33,6 +36,7 @@ fn main() -> std::io::Result<()> {
         .invoke_handler(tauri::generate_handler![
             // common
             cmds::get_sys_proxy,
+            cmds::get_auto_proxy,
             cmds::open_app_dir,
             cmds::open_logs_dir,
             cmds::open_web_url,

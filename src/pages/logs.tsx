@@ -1,14 +1,6 @@
 import { useMemo, useState } from "react";
 import { useRecoilState } from "recoil";
-import {
-  Box,
-  Button,
-  IconButton,
-  MenuItem,
-  Paper,
-  Select,
-  TextField,
-} from "@mui/material";
+import { Box, Button, IconButton, MenuItem } from "@mui/material";
 import { Virtuoso } from "react-virtuoso";
 import { useTranslation } from "react-i18next";
 import {
@@ -19,6 +11,8 @@ import { atomEnableLog, atomLogData } from "@/services/states";
 import { BaseEmpty, BasePage } from "@/components/base";
 import LogItem from "@/components/log/log-item";
 import { useCustomTheme } from "@/components/layout/use-custom-theme";
+import { BaseSearchBox } from "@/components/base/base-search-box";
+import { BaseStyledSelect } from "@/components/base/base-styled-select";
 
 const LogPage = () => {
   const { t } = useTranslation();
@@ -27,16 +21,15 @@ const LogPage = () => {
   const { theme } = useCustomTheme();
   const isDark = theme.palette.mode === "dark";
   const [logState, setLogState] = useState("all");
-  const [filterText, setFilterText] = useState("");
+  const [match, setMatch] = useState(() => (_: string) => true);
 
   const filterLogs = useMemo(() => {
-    return logData.filter((data) => {
-      return (
-        data.payload.includes(filterText) &&
-        (logState === "all" ? true : data.type.includes(logState))
-      );
-    });
-  }, [logData, logState, filterText]);
+    return logData
+      .filter((data) =>
+        logState === "all" ? true : data.type.includes(logState)
+      )
+      .filter((data) => match(data.payload));
+  }, [logData, logState, match]);
 
   return (
     <BasePage
@@ -77,36 +70,16 @@ const LogPage = () => {
           alignItems: "center",
         }}
       >
-        <Select
-          size="small"
-          autoComplete="off"
+        <BaseStyledSelect
           value={logState}
           onChange={(e) => setLogState(e.target.value)}
-          sx={{
-            width: 120,
-            height: 33.375,
-            mr: 1,
-            '[role="button"]': { py: 0.65 },
-          }}
         >
           <MenuItem value="all">ALL</MenuItem>
           <MenuItem value="inf">INFO</MenuItem>
           <MenuItem value="warn">WARN</MenuItem>
           <MenuItem value="err">ERROR</MenuItem>
-        </Select>
-
-        <TextField
-          hiddenLabel
-          fullWidth
-          size="small"
-          autoComplete="off"
-          spellCheck="false"
-          variant="outlined"
-          placeholder={t("Filter conditions")}
-          value={filterText}
-          onChange={(e) => setFilterText(e.target.value)}
-          sx={{ input: { py: 0.65, px: 1.25 } }}
-        />
+        </BaseStyledSelect>
+        <BaseSearchBox onSearch={(match) => setMatch(() => match)} />
       </Box>
 
       <Box

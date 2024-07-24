@@ -19,7 +19,7 @@ import type { IRenderItem } from "./use-render-list";
 import { useVerge } from "@/hooks/use-verge";
 import { useRecoilState } from "recoil";
 import { atomThemeMode } from "@/services/states";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { downloadIconCache } from "@/services/cmds";
 
@@ -49,7 +49,8 @@ export const ProxyRender = (props: RenderProps) => {
 
   async function initIconCachePath() {
     if (group.icon && group.icon.trim().startsWith("http")) {
-      const fileName = getFileName(group.icon);
+      const fileName =
+        group.name.replaceAll(" ", "") + "-" + getFileName(group.icon);
       const iconPath = await downloadIconCache(group.icon, fileName);
       setIconCachePath(convertFileSrc(iconPath));
     }
@@ -76,7 +77,7 @@ export const ProxyRender = (props: RenderProps) => {
           group.icon.trim().startsWith("http") && (
             <img
               src={iconCachePath === "" ? group.icon : iconCachePath}
-              height="32px"
+              width="32px"
               style={{ marginRight: "12px", borderRadius: "6px" }}
             />
           )}
@@ -85,7 +86,7 @@ export const ProxyRender = (props: RenderProps) => {
           group.icon.trim().startsWith("data") && (
             <img
               src={group.icon}
-              height="32px"
+              width="32px"
               style={{ marginRight: "12px", borderRadius: "6px" }}
             />
           )}
@@ -94,7 +95,7 @@ export const ProxyRender = (props: RenderProps) => {
           group.icon.trim().startsWith("<svg") && (
             <img
               src={`data:image/svg+xml;base64,${btoa(group.icon)}`}
-              height="32px"
+              width="32px"
             />
           )}
         <ListItemText
@@ -141,7 +142,7 @@ export const ProxyRender = (props: RenderProps) => {
   if (type === 2 && !group.hidden) {
     return (
       <ProxyItem
-        groupName={group.name}
+        group={group}
         proxy={proxy!}
         selected={group.now === proxy?.name}
         showType={headState?.showType}
@@ -170,6 +171,18 @@ export const ProxyRender = (props: RenderProps) => {
   }
 
   if (type === 4 && !group.hidden) {
+    const proxyColItemsMemo = useMemo(() => {
+      return proxyCol?.map((proxy) => (
+        <ProxyItemMini
+          key={item.key + proxy.name}
+          group={group}
+          proxy={proxy!}
+          selected={group.now === proxy.name}
+          showType={headState?.showType}
+          onClick={() => onChangeProxy(group, proxy!)}
+        />
+      ));
+    }, [proxyCol, group, headState]);
     return (
       <Box
         sx={{
@@ -182,16 +195,7 @@ export const ProxyRender = (props: RenderProps) => {
           gridTemplateColumns: `repeat(${item.col! || 2}, 1fr)`,
         }}
       >
-        {proxyCol?.map((proxy) => (
-          <ProxyItemMini
-            key={item.key + proxy.name}
-            groupName={group.name}
-            proxy={proxy!}
-            selected={group.now === proxy.name}
-            showType={headState?.showType}
-            onClick={() => onChangeProxy(group, proxy!)}
-          />
-        ))}
+        {proxyColItemsMemo}
       </Box>
     );
   }
