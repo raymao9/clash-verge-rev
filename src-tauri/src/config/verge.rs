@@ -222,7 +222,7 @@ impl IVerge {
             pac_file_content: Some(DEFAULT_PAC.into()),
             enable_random_port: Some(false),
             #[cfg(not(target_os = "windows"))]
-            verge_redir_port: Some(7895),
+            verge_redir_port: Some(1088),
             #[cfg(not(target_os = "windows"))]
             verge_redir_enabled: Some(true),
             #[cfg(target_os = "linux")]

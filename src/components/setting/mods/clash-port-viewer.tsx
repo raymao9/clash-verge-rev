@@ -16,7 +16,7 @@ export const ClashPortViewer = forwardRef<DialogRef>((props, ref) => {
 
   const [open, setOpen] = useState(false);
   const [redirPort, setRedirPort] = useState(
-    verge?.verge_redir_port ?? clashInfo?.redir_port ?? 7895
+    verge?.verge_redir_port ?? clashInfo?.redir_port ?? 1088
   );
   const [redirEnabled, setRedirEnabled] = useState(
     verge?.verge_redir_enabled ?? true

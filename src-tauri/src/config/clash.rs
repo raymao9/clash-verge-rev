@@ -40,7 +40,7 @@ impl IClashTemp {
         tun.insert("dns-hijack".into(), vec!["any:53"].into());
         tun.insert("mtu".into(), 1500.into());
         #[cfg(not(target_os = "windows"))]
-        map.insert("redir-port".into(), 7895.into());
+        map.insert("redir-port".into(), 1088.into());
         #[cfg(target_os = "linux")]
         map.insert("tproxy-port".into(), 7896.into());
         map.insert("mixed-port".into(), 7890.into());
@@ -129,9 +129,9 @@ impl IClashTemp {
                 Value::Number(val_num) => val_num.as_u64().map(|u| u as u16),
                 _ => None,
             })
-            .unwrap_or(7895);
+            .unwrap_or(1088);
         if port == 0 {
-            port = 7895;
+            port = 1088;
         }
         port
     }
