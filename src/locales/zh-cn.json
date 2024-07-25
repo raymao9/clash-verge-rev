@@ -228,9 +228,9 @@
   "Uninstall": "卸载",
 
   "Portable Updater Error": "便携版不支持应用内更新，请手动下载替换",
-  "Tun Mode Info": "Tun模式需要授予内核相关权限，使用前请先开启服务模式",
+  "Tun Mode Info": "Tun 模式需要授予内核相关权限，使用前请先开启服务模式",
   "System and Mixed Can Only be Used in Service Mode": "System 和 Mixed 只能在服务模式下使用",
-  "Information: Please make sure that the Clash Verge Service is installed and enabled": "提示信息: 请确保 Clash Verge Service 已安装并启用",
+  "Information: Please make sure that the Clash Verge Service is installed and enabled": "提示信息：Tun 模式需要授予内核相关权限，使用前请先安装并启用服务模式，以便体验完整功能。",
 
   "Match Case": "区分大小写",
   "Match Whole Word": "全字匹配",

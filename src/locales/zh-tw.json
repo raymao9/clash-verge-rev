@@ -228,7 +228,7 @@
   "Portable Updater Error": "可攜版不支援應用程式韌體更新，請手動下載新版安裝",
   "Tun Mode Info": "啟用 Tun 模式前請先開啟服務模式，Clash 核心需取得系統權限",
   "System and Mixed Can Only be Used in Service Mode": "System 和 Mixed 僅適用於服務模式",
-  "Information: Please make sure that the Clash Verge Service is installed and enabled": "注意：「Tun 模式」需要搭配「服務模式」使用，否則可能會遇到一些問題，請確保已安裝並啟用「服務模式」，才能使用完整的「Tun 模式」功能。",
+  "Information: Please make sure that the Clash Verge Service is installed and enabled": "注意：啟用 Tun 模式前需要保證 Clash 核心取得系統權限，請先安裝並啟用服務模式，以便體驗完整功能。",
 
   "Match Case": "區分大小寫",
   "Match Whole Word": "完全符合",
