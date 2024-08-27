@@ -1,10 +1,10 @@
-name: Me
+name: Me_CN
 
 on:
   workflow_dispatch:
   push:
-    branches: [me, me_cn]
-    tags: [me]
+    branches: [me_cn]
+    tags: [me_cn]
 permissions: write-all
 env:
   CARGO_INCREMENTAL: 0
@@ -30,10 +30,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Init Submodule
-        if: matrix.target == 'aarch64-pc-windows-msvc'
-        run: git submodule update --init --recursive
-
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@stable
 
@@ -44,13 +40,15 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: src-tauri
+          cache-all-crates: true
+          cache-on-failure: true
 
       - name: Install Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
           version: 8
@@ -60,6 +58,7 @@ jobs:
         run: |
           pnpm i
           pnpm check ${{ matrix.target }}
+
       - name: Tauri Build
         uses: tauri-apps/tauri-action@v0
         env:
@@ -67,8 +66,8 @@ jobs:
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
-          tagName: v__VERSION__
-          releaseName: "Clash Verge Rev v__VERSION__ me"
+          tagName: v__VERSION__.cn
+          releaseName: "Clash Verge Rev v__VERSION__ me_cn"
           releaseBody: "A customized version for personal use that follows the main branch."
           releaseDraft: false
           prerelease: false
@@ -87,7 +86,7 @@ jobs:
         with:
           node-version: "20"
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
           version: 8
