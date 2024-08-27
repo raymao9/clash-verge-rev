@@ -1,10 +1,10 @@
-name: Me
+name: Me_CN
 
 on:
   workflow_dispatch:
   push:
-    branches: [me, me_cn]
-    tags: [me]
+    branches: [me_cn]
+    tags: [me_cn]
 permissions: write-all
 env:
   CARGO_INCREMENTAL: 0
@@ -68,7 +68,7 @@ jobs:
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
           tagName: v__VERSION__
-          releaseName: "Clash Verge Rev v__VERSION__ me"
+          releaseName: "Clash Verge Rev v__VERSION__ me_cn"
           releaseBody: "A customized version for personal use that follows the main branch."
           releaseDraft: false
           prerelease: false
