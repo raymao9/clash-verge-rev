@@ -67,7 +67,7 @@ impl Tray {
 
     pub fn update_part() -> Result<()> {
         let app_handle = handle::Handle::global().app_handle().unwrap();
-        let use_zh = { Config::verge().latest().language == Some("zh".into()) };
+        let use_zh = { Config::verge().latest().language == Some("cn".into()) };
         let version = VERSION.get().unwrap();
         let mode = {
             Config::clash()
@@ -192,7 +192,7 @@ impl Tray {
             "Clash Verge {version}\n{}: {}\n{}: {}\n{}: {}",
             t!("SysProxy", "系统代理", use_zh),
             switch_map[system_proxy],
-            t!("TUN", "Tun模式", use_zh),
+            t!("Tun Mode", "Tun 模式", use_zh),
             switch_map[tun_mode],
             t!("Profile", "当前订阅", use_zh),
             current_profile_name
@@ -208,7 +208,7 @@ fn create_tray_menu(
     tun_mode_enabled: bool,
 ) -> Result<tauri::menu::Menu<Wry>> {
     let mode = mode.unwrap_or("");
-    let use_zh = { Config::verge().latest().language == Some("zh".into()) };
+    let use_zh = { Config::verge().latest().language == Some("cn".into()) };
     let version = VERSION.get().unwrap();
 
     let open_window = &MenuItem::with_id(
@@ -263,7 +263,7 @@ fn create_tray_menu(
     let tun_mode = &CheckMenuItem::with_id(
         app_handle,
         "tun_mode",
-        t!("TUN Mode", "Tun模式", use_zh),
+        t!("TUN Mode", "Tun 模式", use_zh),
         true,
         tun_mode_enabled,
         None::<&str>,
@@ -273,7 +273,7 @@ fn create_tray_menu(
     let copy_env = &MenuItem::with_id(
         app_handle,
         "copy_env",
-        t!("Copy Env", "复制环境变量", use_zh),
+        t!("Copy Env", "复制终端机代理命令", use_zh),
         true,
         None::<&str>,
     )

@@ -95,11 +95,9 @@ const SettingVerge = ({ onError }: Props) => {
           onChange={(e) => onChangeData({ language: e })}
           onGuard={(e) => patchVerge({ language: e })}
         >
-          <Select size="small" sx={{ width: 110, "> div": { py: "7.5px" } }}>
-            <MenuItem value="zh">中文</MenuItem>
+          <Select size="small" sx={{ width: 140, "> div": { py: "7.5px" } }}>
+            <MenuItem value="cn">简体中文</MenuItem>
             <MenuItem value="en">English</MenuItem>
-            <MenuItem value="ru">Русский</MenuItem>
-            <MenuItem value="fa">فارسی</MenuItem>
           </Select>
         </GuardState>
       </SettingItem>
@@ -114,25 +112,6 @@ const SettingVerge = ({ onError }: Props) => {
           <ThemeModeSwitch />
         </GuardState>
       </SettingItem>
-
-      {OS !== "linux" && (
-        <SettingItem label={t("Tray Click Event")}>
-          <GuardState
-            value={tray_event ?? "main_window"}
-            onCatch={onError}
-            onFormat={(e: any) => e.target.value}
-            onChange={(e) => onChangeData({ tray_event: e })}
-            onGuard={(e) => patchVerge({ tray_event: e })}
-          >
-            <Select size="small" sx={{ width: 140, "> div": { py: "7.5px" } }}>
-              <MenuItem value="main_window">{t("Show Main Window")}</MenuItem>
-              <MenuItem value="system_proxy">{t("System Proxy")}</MenuItem>
-              <MenuItem value="tun_mode">{t("Tun Mode")}</MenuItem>
-              <MenuItem value="disable">{t("Disable")}</MenuItem>
-            </Select>
-          </GuardState>
-        </SettingItem>
-      )}
 
       <SettingItem
         label={t("Copy Env Type")}
@@ -271,8 +250,6 @@ const SettingVerge = ({ onError }: Props) => {
       <SettingItem onClick={openCoreDir} label={t("Open Core Dir")} />
 
       <SettingItem onClick={openLogsDir} label={t("Open Logs Dir")} />
-
-      <SettingItem onClick={onCheckUpdate} label={t("Check for Updates")} />
 
       <SettingItem onClick={openDevTools} label={t("Open Dev Tools")} />
 

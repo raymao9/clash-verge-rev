@@ -18,7 +18,6 @@ import { Notice } from "@/components/base";
 import { LayoutItem } from "@/components/layout/layout-item";
 import { LayoutControl } from "@/components/layout/layout-control";
 import { LayoutTraffic } from "@/components/layout/layout-traffic";
-import { UpdateButton } from "@/components/layout/update-button";
 import { useCustomTheme } from "@/components/layout/use-custom-theme";
 import getSystem from "@/utils/get-system";
 import "dayjs/locale/ru";
@@ -95,7 +94,7 @@ const Layout = () => {
 
   useEffect(() => {
     if (language) {
-      dayjs.locale(language === "zh" ? "zh-cn" : language);
+      dayjs.locale(language === "cn" ? "zh-cn" : language);
       i18next.changeLanguage(language);
     }
     if (start_page) {
@@ -160,7 +159,6 @@ const Layout = () => {
                 />
                 <LogoSvg fill={isDark ? "white" : "black"} />
               </div>
-              {<UpdateButton className="the-newbtn" />}
             </div>
 
             <List className="the-menu">
