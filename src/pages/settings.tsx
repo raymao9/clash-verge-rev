@@ -35,33 +35,10 @@ const SettingPage = () => {
     <BasePage
       title={t("Settings")}
       header={
-        <ButtonGroup variant="contained" aria-label="Basic button group">
-          <IconButton
-            size="medium"
-            color="inherit"
-            title={t("Manual")}
-            onClick={toGithubDoc}
-          >
-            <HelpOutlineRounded fontSize="inherit" />
-          </IconButton>
-          <IconButton
-            size="medium"
-            color="inherit"
-            title={t("TG Channel")}
-            onClick={toTelegramChannel}
-          >
-            <Telegram fontSize="inherit" />
-          </IconButton>
-
-          <IconButton
-            size="medium"
-            color="inherit"
-            title={t("Github Repo")}
-            onClick={toGithubRepo}
-          >
-            <GitHub fontSize="inherit" />
-          </IconButton>
-        </ButtonGroup>
+        <ButtonGroup
+          variant="contained"
+          aria-label="Basic button group"
+        ></ButtonGroup>
       }
     >
       <Grid container spacing={{ xs: 1.5, lg: 1.5 }}>
