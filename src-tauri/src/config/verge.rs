@@ -215,7 +215,7 @@ impl IVerge {
     pub fn template() -> Self {
         Self {
             clash_core: Some("verge-mihomo".into()),
-            language: Some("zh".into()),
+            language: Some("cn".into()),
             theme_mode: Some("system".into()),
             #[cfg(not(target_os = "windows"))]
             env_type: Some("bash".into()),
@@ -245,10 +245,10 @@ impl IVerge {
             verge_tproxy_port: Some(7896),
             #[cfg(target_os = "linux")]
             verge_tproxy_enabled: Some(false),
-            verge_mixed_port: Some(7897),
-            verge_socks_port: Some(7898),
+            verge_mixed_port: Some(7890),
+            verge_socks_port: Some(1080),
             verge_socks_enabled: Some(false),
-            verge_port: Some(7899),
+            verge_port: Some(1087),
             verge_http_enabled: Some(false),
             enable_proxy_guard: Some(false),
             use_default_bypass: Some(true),
