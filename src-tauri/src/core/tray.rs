@@ -67,7 +67,8 @@ impl Tray {
 
     pub fn update_part() -> Result<()> {
         let app_handle = handle::Handle::global().app_handle().unwrap();
-        let use_zh = { Config::verge().latest().language == Some("cn".into()) };
+        let use_tw = { Config::verge().latest().language == Some("tw".into()) };
+        let use_cn = { Config::verge().latest().language == Some("cn".into()) };
         let version = VERSION.get().unwrap();
         let mode = {
             Config::clash()
@@ -190,11 +191,11 @@ impl Tray {
 
         let _ = tray.set_tooltip(Some(&format!(
             "Clash Verge {version}\n{}: {}\n{}: {}\n{}: {}",
-            t!("SysProxy", "系统代理", use_zh),
+            t!("系統代理", "系统代理", "System Proxy", use_tw, use_cn),
             switch_map[system_proxy],
-            t!("Tun Mode", "Tun 模式", use_zh),
+            t!("Tun 模式", "Tun 模式", "Tun Mode", use_tw, use_cn),
             switch_map[tun_mode],
-            t!("Profile", "当前订阅", use_zh),
+            t!("現用訂閱", "当前订阅", "Curent Profile", use_tw, use_cn),
             current_profile_name
         )));
         Ok(())
@@ -208,13 +209,14 @@ fn create_tray_menu(
     tun_mode_enabled: bool,
 ) -> Result<tauri::menu::Menu<Wry>> {
     let mode = mode.unwrap_or("");
-    let use_zh = { Config::verge().latest().language == Some("cn".into()) };
+    let use_tw = { Config::verge().latest().language == Some("tw".into()) };
+    let use_cn = { Config::verge().latest().language == Some("cn".into()) };
     let version = VERSION.get().unwrap();
 
     let open_window = &MenuItem::with_id(
         app_handle,
         "open_window",
-        t!("Dashboard", "打开面板", use_zh),
+        t!("打開主視窗", "打开面板", "Dashboard", use_tw, use_cn),
         true,
         None::<&str>,
     )
@@ -223,7 +225,7 @@ fn create_tray_menu(
     let rule_mode = &CheckMenuItem::with_id(
         app_handle,
         "rule_mode",
-        t!("Rule Mode", "规则模式", use_zh),
+        t!("分流模式", "规则模式", "Rule Mode", use_tw, use_cn),
         true,
         mode == "rule",
         None::<&str>,
@@ -233,7 +235,7 @@ fn create_tray_menu(
     let global_mode = &CheckMenuItem::with_id(
         app_handle,
         "global_mode",
-        t!("Global Mode", "全局模式", use_zh),
+        t!("全局模式", "全局模式", "Global Mode", use_tw, use_cn),
         true,
         mode == "global",
         None::<&str>,
@@ -243,7 +245,7 @@ fn create_tray_menu(
     let direct_mode = &CheckMenuItem::with_id(
         app_handle,
         "direct_mode",
-        t!("Direct Mode", "直连模式", use_zh),
+        t!("直連模式", "直连模式", "Direct Mode", use_tw, use_cn),
         true,
         mode == "direct",
         None::<&str>,
@@ -253,7 +255,7 @@ fn create_tray_menu(
     let system_proxy = &CheckMenuItem::with_id(
         app_handle,
         "system_proxy",
-        t!("System Proxy", "系统代理", use_zh),
+        t!("啟用系統代理", "系统代理", "System Proxy", use_tw, use_cn),
         true,
         system_proxy_enabled,
         None::<&str>,
@@ -263,7 +265,7 @@ fn create_tray_menu(
     let tun_mode = &CheckMenuItem::with_id(
         app_handle,
         "tun_mode",
-        t!("TUN Mode", "Tun 模式", use_zh),
+        t!("啟用 Tun 模式", "打开 Tun 模式", "Tun Mode", use_tw, use_cn),
         true,
         tun_mode_enabled,
         None::<&str>,
@@ -273,16 +275,7 @@ fn create_tray_menu(
     let copy_env = &MenuItem::with_id(
         app_handle,
         "copy_env",
-        t!("Copy Env", "复制终端机代理命令", use_zh),
-        true,
-        None::<&str>,
-    )
-    .unwrap();
-
-    let open_app_dir = &MenuItem::with_id(
-        app_handle,
-        "open_app_dir",
-        t!("Conf Dir", "配置目录", use_zh),
+        t!("複製終端機代理指令", "复制环境变量", "Copy Env", use_tw, use_cn),
         true,
         None::<&str>,
     )
@@ -291,7 +284,16 @@ fn create_tray_menu(
     let open_core_dir = &MenuItem::with_id(
         app_handle,
         "open_core_dir",
-        t!("Core Dir", "内核目录", use_zh),
+        t!("Core 所在位置", "内核目录", "Core Dir", use_tw, use_cn),
+        true,
+        None::<&str>,
+    )
+    .unwrap();
+
+    let open_app_dir = &MenuItem::with_id(
+        app_handle,
+        "open_app_dir",
+        t!("訂閱檔案所在位置", "配置目录", "Conf Dir", use_tw, use_cn),
         true,
         None::<&str>,
     )
@@ -300,7 +302,7 @@ fn create_tray_menu(
     let open_logs_dir = &MenuItem::with_id(
         app_handle,
         "open_logs_dir",
-        t!("Logs Dir", "日志目录", use_zh),
+        t!("連線記錄所在位置", "日志目录", "Logs Dir", use_tw, use_cn),
         true,
         None::<&str>,
     )
@@ -308,16 +310,16 @@ fn create_tray_menu(
     let open_dir = &Submenu::with_id_and_items(
         app_handle,
         "open_dir",
-        t!("Open Dir", "打开目录", use_zh),
+        t!("打開檔案位置", "打开目录", "Open Dir", use_tw, use_cn),
         true,
-        &[open_app_dir, open_core_dir, open_logs_dir],
+        &[open_core_dir, open_app_dir, open_logs_dir],
     )
     .unwrap();
 
     let restart_clash = &MenuItem::with_id(
         app_handle,
         "restart_clash",
-        t!("Restart Clash Core", "重启Clash内核", use_zh),
+        t!("重啟 Clash", "重启 Clash", "Restart Clash Core", use_tw, use_cn),
         true,
         None::<&str>,
     )
@@ -326,7 +328,7 @@ fn create_tray_menu(
     let restart_app = &MenuItem::with_id(
         app_handle,
         "restart_app",
-        t!("Restart App", "重启App", use_zh),
+        t!("重啟 APP", "重启应用", "Restart App", use_tw, use_cn),
         true,
         None::<&str>,
     )
@@ -344,7 +346,7 @@ fn create_tray_menu(
     let more = &Submenu::with_id_and_items(
         app_handle,
         "more",
-        t!("More", "更多", use_zh),
+        t!("更多功能", "更多", "More", use_tw, use_cn),
         true,
         &[restart_clash, restart_app, app_version],
     )
@@ -353,7 +355,7 @@ fn create_tray_menu(
     let quit = &MenuItem::with_id(
         app_handle,
         "quit",
-        t!("Quit", "退出", use_zh),
+        t!("結束", "退出", "Quit", use_tw, use_cn),
         true,
         Some("CmdOrControl+Q"),
     )

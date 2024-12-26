@@ -192,12 +192,16 @@ macro_rules! ret_err {
 
 #[macro_export]
 macro_rules! t {
-    ($en:expr, $zh:expr, $use_zh:expr) => {
-        if $use_zh {
-            $zh
+    ($tw: expr, $cn: expr, $en: expr, $use_tw: expr, $use_cn: expr) => {
+        if $use_tw {
+            $tw
         } else {
-            $en
-        }
+	    if $use_cn {
+	       $cn
+            } else {
+               $en
+            }
+	}
     };
 }
 

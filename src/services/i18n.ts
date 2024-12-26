@@ -3,12 +3,14 @@ import { initReactI18next } from "react-i18next";
 import en from "@/locales/en.json";
 import ru from "@/locales/ru.json";
 import fa from "@/locales/fa.json";
+import tw from "@/locales/zh-tw.json";
 import cn from "@/locales/zh-cn.json";
 
 const resources = {
   en: { translation: en },
   ru: { translation: ru },
   fa: { translation: fa },
+  tw: { translation: tw },
   cn: { translation: cn },
 };
 

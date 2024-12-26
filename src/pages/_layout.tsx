@@ -22,6 +22,7 @@ import { useCustomTheme } from "@/components/layout/use-custom-theme";
 import getSystem from "@/utils/get-system";
 import "dayjs/locale/ru";
 import "dayjs/locale/zh-cn";
+import "dayjs/locale/zh-tw";
 import { getPortableFlag } from "@/services/cmds";
 import React from "react";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
@@ -94,7 +95,7 @@ const Layout = () => {
 
   useEffect(() => {
     if (language) {
-      dayjs.locale(language === "cn" ? "zh-cn" : language);
+      dayjs.locale(language === "tw" ? "zh-tw" : language);
       i18next.changeLanguage(language);
     }
     if (start_page) {
