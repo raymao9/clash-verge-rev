@@ -3,8 +3,8 @@ name: Me_TW
 on:
   workflow_dispatch:
   push:
-    branches: [me]
-    tags: [me]
+    branches: [zh_TW_v1.6.4]
+    tags: [zh_TW_v1.6.4]
 permissions: write-all
 env:
   CARGO_INCREMENTAL: 0
