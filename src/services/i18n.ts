@@ -1,21 +1,7 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
-export const supportedLanguages = [
-  "en",
-  "ru",
-  "zh",
-  "fa",
-  "tt",
-  "id",
-  "ar",
-  "ko",
-  "tr",
-  "de",
-  "es",
-  "jp",
-  "zhtw",
-];
+export const supportedLanguages = ["zhtw", "zh", "en"];
 
 export const languages: Record<string, any> = supportedLanguages.reduce(
   (acc, lang) => {
@@ -31,17 +17,17 @@ export const loadLanguage = async (language: string) => {
     return module.default;
   } catch (error) {
     console.warn(
-      `Failed to load language ${language}, fallback to zh, ${error}`,
+      `Failed to load language ${language}, fallback to en, ${error}`,
     );
-    const fallback = await import("@/locales/zh.json");
+    const fallback = await import("@/locales/en.json");
     return fallback.default;
   }
 };
 
 i18n.use(initReactI18next).init({
   resources: {},
-  lng: "zh",
-  fallbackLng: "zh",
+  lng: "zhtw",
+  fallbackLng: "zhtw",
   interpolation: {
     escapeValue: false,
   },

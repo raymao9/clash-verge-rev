@@ -26,7 +26,7 @@ export const MiscViewer = forwardRef<DialogRef>((props, ref) => {
     appLogMaxSize: 8,
     appLogMaxCount: 12,
     autoCloseConnection: true,
-    autoCheckUpdate: true,
+    autoCheckUpdate: false,
     enableBuiltinEnhanced: true,
     proxyLayoutColumn: 6,
     enableAutoDelayDetection: false,
@@ -43,7 +43,7 @@ export const MiscViewer = forwardRef<DialogRef>((props, ref) => {
         appLogMaxSize: verge?.app_log_max_size ?? 128,
         appLogMaxCount: verge?.app_log_max_count ?? 8,
         autoCloseConnection: verge?.auto_close_connection ?? true,
-        autoCheckUpdate: verge?.auto_check_update ?? true,
+        autoCheckUpdate: verge?.auto_check_update ?? false,
         enableBuiltinEnhanced: verge?.enable_builtin_enhanced ?? true,
         proxyLayoutColumn: verge?.proxy_layout_column || 6,
         enableAutoDelayDetection: verge?.enable_auto_delay_detection ?? false,
@@ -183,17 +183,6 @@ export const MiscViewer = forwardRef<DialogRef>((props, ref) => {
               setValues((v) => ({ ...v, autoCloseConnection: c }))
             }
             sx={{ marginLeft: "auto" }}
-          />
-        </ListItem>
-
-        <ListItem sx={{ padding: "5px 2px" }}>
-          <ListItemText primary={t("Auto Check Update")} />
-          <Switch
-            edge="end"
-            checked={values.autoCheckUpdate}
-            onChange={(_, c) =>
-              setValues((v) => ({ ...v, autoCheckUpdate: c }))
-            }
           />
         </ListItem>
 

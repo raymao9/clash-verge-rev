@@ -152,7 +152,14 @@ macro_rules! ret_err {
 
 #[macro_export]
 macro_rules! t {
-    ($en:expr, $zh:expr, $use_zh:expr) => {
-        if $use_zh { $zh } else { $en }
+    ($en:expr, $zh:expr, $zhtw:expr, $lang:expr) => {
+        // 判斷 $lang 變數的值
+        if $lang == "zhtw" {
+            $zhtw
+        } else if $lang == "zh" {
+            $zh
+        } else {
+            $en // 否則預設使用英文
+        }
     };
 }

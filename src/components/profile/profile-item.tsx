@@ -16,7 +16,6 @@ import {
   Menu,
   CircularProgress,
 } from "@mui/material";
-import { open } from "@tauri-apps/plugin-shell";
 import { useLockFn } from "ahooks";
 import dayjs from "dayjs";
 import { useEffect, useReducer, useState } from "react";
@@ -211,7 +210,6 @@ export const ProfileItem = (props: Props) => {
   // remote file mode
   const hasUrl = !!itemData.url;
   const hasExtra = !!extra; // only subscription url has extra info
-  const hasHome = !!itemData.home; // only subscription url has home page
 
   const { upload = 0, download = 0, total = 0 } = extra ?? {};
   const from = parseUrl(itemData.url);
@@ -262,11 +260,6 @@ export const ProfileItem = (props: Props) => {
   const [mergeOpen, setMergeOpen] = useState(false);
   const [scriptOpen, setScriptOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
-
-  const onOpenHome = () => {
-    setAnchorEl(null);
-    open(itemData.home ?? "");
-  };
 
   const onEditInfo = () => {
     setAnchorEl(null);
@@ -354,9 +347,7 @@ export const ProfileItem = (props: Props) => {
     }
   });
 
-  const urlModeMenu = (
-    hasHome ? [{ label: "Home", handler: onOpenHome, disabled: false }] : []
-  ).concat([
+  const urlModeMenu = [
     { label: "Select", handler: onForceSelect, disabled: false },
     { label: "Edit Info", handler: onEditInfo, disabled: false },
     { label: "Edit File", handler: onEditFile, disabled: false },
@@ -403,7 +394,7 @@ export const ProfileItem = (props: Props) => {
       },
       disabled: false,
     },
-  ]);
+  ];
   const fileModeMenu = [
     { label: "Select", handler: onForceSelect, disabled: false },
     { label: "Edit Info", handler: onEditInfo, disabled: false },
