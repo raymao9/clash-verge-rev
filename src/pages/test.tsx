@@ -29,6 +29,11 @@ import apple from "@/assets/image/test/apple.svg?raw";
 import github from "@/assets/image/test/github.svg?raw";
 import google from "@/assets/image/test/google.svg?raw";
 import youtube from "@/assets/image/test/youtube.svg?raw";
+import netflix from "@/assets/image/test/netflix.svg?raw";
+import disneyplus from "@/assets/image/test/disneyplus.svg?raw";
+import spotify from "@/assets/image/test/spotify.svg?raw";
+import chatgpt from "@/assets/image/test/chatgpt.svg?raw";
+import gemini from "@/assets/image/test/gemini.svg?raw";
 
 const TestPage = () => {
   const { t } = useTranslation();
@@ -65,6 +70,36 @@ const TestPage = () => {
       name: "Youtube",
       url: "https://www.youtube.com",
       icon: youtube,
+    },
+    {
+      uid: nanoid(),
+      name: "Netflix",
+      url: "https://www.netflix.com/title/81280792",
+      icon: netflix,
+    },
+    {
+      uid: nanoid(),
+      name: "Disney+",
+      url: "https://disney.api.edge.bamgrid.com/devices",
+      icon: disneyplus,
+    },
+    {
+      uid: nanoid(),
+      name: "Spotify",
+      url: "https://www.spotify.com/api/content/v1/country-selector?platform=web&format=json",
+      icon: spotify,
+    },
+    {
+      uid: nanoid(),
+      name: "ChatGPT",
+      url: "https://chat.openai.com/cdn-cgi/trace",
+      icon: chatgpt,
+    },
+    {
+      uid: nanoid(),
+      name: "Gemini",
+      url: "https://gemini.google.com",
+      icon: gemini,
     },
   ];
 
