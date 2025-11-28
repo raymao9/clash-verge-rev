@@ -242,7 +242,7 @@ impl Tray {
 
         let app_handle = handle::Handle::app_handle();
         let tray_event = { Config::verge().await.latest_arc().tray_event.clone() };
-        let tray_event = tray_event.unwrap_or_else(|| "main_window".into());
+        let tray_event = tray_event.unwrap_or_else(|| "tray_menu".into());
         let tray = app_handle
             .tray_by_id("main")
             .ok_or_else(|| anyhow::anyhow!("Failed to get main tray"))?;
@@ -529,7 +529,7 @@ impl Tray {
         #[cfg(any(target_os = "macos", target_os = "windows"))]
         let show_menu_on_left_click = {
             let tray_event = { Config::verge().await.latest_arc().tray_event.clone() };
-            let tray_event: String = tray_event.unwrap_or_else(|| "main_window".into());
+            let tray_event: String = tray_event.unwrap_or_else(|| "tray_menu".into());
             tray_event.as_str() == "tray_menu"
         };
 
@@ -556,7 +556,7 @@ impl Tray {
             {
                 AsyncHandler::spawn(|| async move {
                     let tray_event = { Config::verge().await.latest_arc().tray_event.clone() };
-                    let tray_event: String = tray_event.unwrap_or_else(|| "main_window".into());
+                    let tray_event: String = tray_event.unwrap_or_else(|| "tray_menu".into());
                     logging!(debug, Type::Tray, "tray event: {tray_event:?}");
 
                     // 添加防抖检查，防止快速连击

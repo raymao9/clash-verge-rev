@@ -198,9 +198,9 @@ impl IClashTemp {
                 Value::Number(val_num) => val_num.as_u64().map(|u| u as u16),
                 _ => None,
             })
-            .unwrap_or(7895);
+            .unwrap_or(1088);
         if port == 0 {
-            port = 7895;
+            port = 1088;
         }
         port
     }
@@ -230,10 +230,10 @@ impl IClashTemp {
                 Value::Number(val_num) => val_num.as_u64().map(|u| u as u16),
                 _ => None,
             })
-            .unwrap_or(7897);
+            .unwrap_or(7890);
 
         if port == 0 {
-            port = 7897;
+            port = 7890;
         }
 
         port
@@ -247,9 +247,9 @@ impl IClashTemp {
                 Value::Number(val_num) => val_num.as_u64().map(|u| u as u16),
                 _ => None,
             })
-            .unwrap_or(7898);
+            .unwrap_or(1080);
         if port == 0 {
-            port = 7898;
+            port = 1080;
         }
         port
     }
@@ -262,9 +262,9 @@ impl IClashTemp {
                 Value::Number(val_num) => val_num.as_u64().map(|u| u as u16),
                 _ => None,
             })
-            .unwrap_or(7899);
+            .unwrap_or(1087);
         if port == 0 {
-            port = 7899;
+            port = 1087;
         }
         port
     }
@@ -361,8 +361,8 @@ fn test_clash_info() {
     fn get_result<S: Into<String>>(port: u16, server: S) -> ClashInfo {
         ClashInfo {
             mixed_port: port,
-            socks_port: 7898,
-            port: 7899,
+            socks_port: 1080,
+            port: 1087,
             server: server.into(),
             secret: None,
         }
@@ -370,10 +370,10 @@ fn test_clash_info() {
 
     assert_eq!(
         IClashTemp(IClashTemp::guard(Mapping::new())).get_client_info(),
-        get_result(7897, "127.0.0.1:9097")
+        get_result(7890, "127.0.0.1:9097")
     );
 
-    assert_eq!(get_case("", ""), get_result(7897, "127.0.0.1:9097"));
+    assert_eq!(get_case("", ""), get_result(7890, "127.0.0.1:9097"));
 
     assert_eq!(get_case(65537, ""), get_result(1, "127.0.0.1:9097"));
 
