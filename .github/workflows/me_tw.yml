@@ -27,7 +27,7 @@ jobs:
   update_tag:
     name: Update tag
     runs-on: ubuntu-latest
-    needs: [release, release-for-fixed-webview2]
+    needs: [release]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -145,103 +145,6 @@ jobs:
           args: --target ${{ matrix.target }}
           includeUpdaterJson: true
 
-  release-for-fixed-webview2:
-    name: Release Build for Fixed WebView2
-    needs: [check_tag_version]
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            arch: x64
-          - os: windows-latest
-            target: aarch64-pc-windows-msvc
-            arch: arm64
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Add Rust Target
-        run: rustup target add ${{ matrix.target }}
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: src-tauri
-          save-if: false
-
-      - name: Install Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        with:
-          run_install: false
-
-      - name: Pnpm install and check
-        run: |
-          pnpm i
-          pnpm run prebuild ${{ matrix.target }}
-
-      - name: Download WebView2 Runtime
-        run: |
-          invoke-webrequest -uri https://github.com/westinyang/WebView2RuntimeArchive/releases/download/109.0.1518.78/Microsoft.WebView2.FixedVersionRuntime.109.0.1518.78.${{ matrix.arch }}.cab -outfile Microsoft.WebView2.FixedVersionRuntime.109.0.1518.78.${{ matrix.arch }}.cab
-          Expand .\Microsoft.WebView2.FixedVersionRuntime.109.0.1518.78.${{ matrix.arch }}.cab -F:* ./src-tauri
-          Remove-Item .\src-tauri\tauri.windows.conf.json
-          Rename-Item .\src-tauri\webview2.${{ matrix.arch }}.json tauri.windows.conf.json
-
-      - name: Tauri build
-        id: build
-        # 上游 5.24 修改了 latest.json 的生成逻辑，且依赖 tauri-plugin-update 2.10.0 暂未发布，故锁定在 0.5.23 版本
-        uses: tauri-apps/tauri-action@v0.5.23
-        env:
-          NODE_OPTIONS: "--max_old_space_size=4096"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-        with:
-          tauriScript: pnpm
-          args: --target ${{ matrix.target }}
-
-      - name: Rename
-        run: |
-          $files = Get-ChildItem ".\src-tauri\target\${{ matrix.target }}\release\bundle\nsis\*-setup.exe"
-          foreach ($file in $files) {
-            $newName = $file.Name -replace "-setup\.exe$", "_fixed_webview2-setup.exe"
-            Rename-Item $file.FullName $newName
-          }
-
-          $files = Get-ChildItem ".\src-tauri\target\${{ matrix.target }}\release\bundle\nsis\*.nsis.zip"
-          foreach ($file in $files) {
-            $newName = $file.Name -replace "-setup\.nsis\.zip$", "_fixed_webview2-setup.nsis.zip"
-            Rename-Item $file.FullName $newName
-          }
-
-          $files = Get-ChildItem ".\src-tauri\target\${{ matrix.target }}\release\bundle\nsis\*-setup.exe.sig"
-          foreach ($file in $files) {
-            $newName = $file.Name -replace "-setup\.exe\.sig$", "_fixed_webview2-setup.exe.sig"
-            Rename-Item $file.FullName $newName
-          }
-
-      - name: Upload Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{steps.build.outputs.appVersion}}
-          name: "Clash Verge Rev v${{steps.build.outputs.appVersion}}"
-          body: "See release notes for detailed changelog."
-          token: ${{ secrets.GITHUB_TOKEN }}
-          prerelease: ${{ contains(github.ref_name, '-rc') }}
-          files: src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*setup*
-
-      - name: Portable Bundle
-        run: pnpm portable-fixed-webview2 ${{ matrix.target }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   release-update:
     if: ${{ !contains(github.ref_name, '-rc') }}
     name: Release Update
@@ -266,31 +169,5 @@ jobs:
 
       - name: Release updater file
         run: pnpm updater
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  release-update-for-fixed-webview2:
-    if: ${{ !contains(github.ref_name, '-rc') }}
-    runs-on: ubuntu-latest
-    needs: [update_tag]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        with:
-          run_install: false
-
-      - name: Pnpm install
-        run: pnpm i
-
-      - name: Release updater file
-        run: pnpm updater-fixed-webview2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

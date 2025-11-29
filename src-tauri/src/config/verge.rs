@@ -338,7 +338,20 @@ impl IVerge {
         let sys_lang = sys_locale::get_locale()
             .unwrap_or_else(|| "en".into())
             .to_lowercase();
+        // 1. 檢查系統語言是否為任何一種中文 (zh-cn, zh-tw, zh-hk, zh-hans, zh-hant, etc.)
+        // 我們涵蓋所有可能的中文變體，包括簡體 (hans) 和繁體 (hant) 腳本標籤。
+        let is_chinese =
+            sys_lang.contains("zh") || sys_lang.contains("hant") || sys_lang.contains("hans");
 
+        // 2. 如果是中文，一律強制返回 'tw' 作為預設值
+        if is_chinese {
+            // 確保 'tw' 在支援列表中，如果不在，則退回英文。
+            if i18n::get_supported_languages().contains(&"tw".into()) {
+                return String::from("tw");
+            }
+        }
+
+        // 3. 處理其他非中文語言的預設值
         let lang_code = sys_lang.split(['_', '-']).next().unwrap_or("en");
         let supported_languages = i18n::get_supported_languages();
 

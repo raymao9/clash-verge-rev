@@ -70,7 +70,7 @@ const initializeApp = () => {
   );
 };
 
-initializeLanguage("zhtw").catch(console.error);
+initializeLanguage("tw").catch(console.error);
 initializeApp();
 
 // 错误处理

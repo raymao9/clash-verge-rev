@@ -9,7 +9,7 @@ use std::{
 };
 use sys_locale;
 
-const DEFAULT_LANGUAGE: &str = "zh";
+const DEFAULT_LANGUAGE: &str = "tw";
 
 type TranslationMap = (String, HashMap<String, Arc<str>>);
 
@@ -41,13 +41,15 @@ pub fn get_supported_languages() -> Vec<String> {
 }
 
 pub async fn current_language() -> String {
-    Config::verge()
+    let language: String = Config::verge()
         .await
         .latest_arc()
         .language
         .as_deref()
         .map(String::from)
-        .unwrap_or_else(get_system_language)
+        .unwrap_or_else(get_system_language);
+
+    language
 }
 
 static TRANSLATIONS: Lazy<RwLock<TranslationMap>> = Lazy::new(|| {

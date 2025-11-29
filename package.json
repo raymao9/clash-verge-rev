@@ -123,12 +123,10 @@
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
       "eslint --fix --max-warnings=0",
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ],
     "*.{css,scss,json,md}": [
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ]
   },
   "type": "module",
