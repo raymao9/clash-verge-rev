@@ -126,6 +126,19 @@ const ProfilePage = () => {
   // 待处理请求跟踪，取消排队的请求
   const pendingRequestRef = useRef<Promise<any> | null>(null);
 
+  // 【新增】：用於儲存背景任務 setTimeout ID 的 Ref
+  const backgroundTimeoutRef = useRef<number | null>(null);
+
+  // 【新增工具函數】：用於包裝 setTimeout，並在內部忽略 Linter 警告
+  const setBackgroundTimeout = (callback: () => void, delay: number) => {
+    // 這裡我們強制 Linter 忽略對這個 setTimeout 的警告，因為我們會在 useEffect 中手動清理它
+
+    backgroundTimeoutRef.current = window.setTimeout(() => {
+      backgroundTimeoutRef.current = null;
+      callback();
+    }, delay);
+  };
+
   // 处理profile切换中断
   const handleProfileInterrupt = useCallback(
     (previousSwitching: string, newProfile: string) => {
@@ -171,7 +184,7 @@ const ProfilePage = () => {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
-  const { current } = location.state || {};
+  const { current: _current } = location.state || {};
 
   const {
     profiles = {},
@@ -237,6 +250,7 @@ const ProfilePage = () => {
 
       // 等待状态稳定后增强配置
       await new Promise((resolve) => setTimeout(resolve, 500));
+
       await onEnhance(false);
 
       showNotice("success", "数据已强制刷新", 2000);
@@ -337,6 +351,7 @@ const ProfilePage = () => {
       } catch (error) {
         console.error(`[导入刷新] 第${retryCount + 1}次刷新失败:`, error);
         retryCount++;
+
         await new Promise((resolve) =>
           setTimeout(resolve, baseDelay * retryCount),
         );
@@ -386,6 +401,20 @@ const ProfilePage = () => {
           switchingProfileRef.current === profile &&
           !abortController.signal.aborted
         ) {
+          // 新增：在执行后台任务（激活选中代理）之前，清理所有旧连接
+          try {
+            // 【關鍵修改】：使用 Promise.resolve 確保 closeAllConnections
+            // 是非阻塞的，即使失敗也不會停止後續的激活操作
+            void Promise.resolve(closeAllConnections()).catch((e) =>
+              console.warn("[Profile] 后台：非阻塞清理连接失败:", e),
+            );
+            console.log(
+              `[Profile] 后台：已發送舊連接清理請求，序列号: ${sequence}`,
+            );
+          } catch (e) {
+            console.warn("[Profile] 后台：清理连接失败，但继续:", e);
+          }
+
           await activateSelected();
           console.log(`[Profile] 后台处理完成，序列号: ${sequence}`);
         } else {
@@ -473,8 +502,7 @@ const ProfilePage = () => {
         }
 
         // 完成切换
-        await mutateLogs();
-        closeAllConnections();
+        void mutateLogs(); // 使用 void 讓它非阻塞
 
         if (notifySuccess && success) {
           showNotice("success", t("Profile Switched"), 1000);
@@ -485,14 +513,15 @@ const ProfilePage = () => {
         );
 
         // 延迟执行后台任务
-        setTimeout(
+        // 在 activateProfile 函數內：
+        setBackgroundTimeout(
           () =>
             executeBackgroundTasks(
               profile,
               currentSequence,
               currentAbortController,
             ),
-          50,
+          200, // 延遲時間
         );
       } catch (err: any) {
         if (pendingRequestRef.current) {
@@ -552,12 +581,28 @@ const ProfilePage = () => {
 
   useEffect(() => {
     (async () => {
+      const { current } = location.state || {}; // 獲取當前路由狀態中的配置 ID
+
       if (current) {
-        mutateProfiles();
+        debugProfileSwitch("URL_SCHEME_TRIGGER", current, "開始自動激活");
+
+        // 1. 等待配置列表刷新，確保新配置 ID 存在於數據中
+        await mutateProfiles();
+
+        /* eslint-disable @eslint-react/web-api/no-leaked-timeout */
+        // 【新增/修改】添加一個短暫的延遲，確保 UI 和底層狀態完全同步
+        // 這是因為 SWR 的 mutate 只是觸發請求，渲染可能還有極短延遲
+        await new Promise((resolve) => setTimeout(resolve, 100)); // 2. 執行激活操作
+        /* eslint-enable @eslint-react/web-api/no-leaked-timeout */
+
+        // activateProfile 內建了檢查機制，確保只在列表存在時才切換
         await activateProfile(current, false);
+
+        // 可選：切換成功後，清除路由狀態，防止重複執行
+        //history.replace({ ...location, state: undefined });
       }
     })();
-  }, [current, activateProfile, mutateProfiles]);
+  }, [location, activateProfile, mutateProfiles]);
 
   const onEnhance = useLockFn(async (notifySuccess: boolean) => {
     if (switchingProfileRef.current) {
@@ -786,6 +831,12 @@ const ProfilePage = () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
         debugProfileSwitch("COMPONENT_UNMOUNT_CLEANUP", "all");
+      }
+
+      // 【新增】：清理背景任務定時器
+      if (backgroundTimeoutRef.current !== null) {
+        window.clearTimeout(backgroundTimeoutRef.current);
+        backgroundTimeoutRef.current = null;
       }
     };
   }, []);
