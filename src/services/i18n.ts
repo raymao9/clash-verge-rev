@@ -19,7 +19,7 @@ export const languages: Record<string, any> = supportedLanguages.reduce(
 
 export const loadLanguage = async (language: string) => {
   // 🚨 關鍵轉換：如果系統要求 "zh"，則將路徑導向 "zhtw" 檔案
-  const finalLanguage = (language === "zh") ? "zhtw" : language;
+  const finalLanguage = language === "zh" ? "zhtw" : language;
   try {
     const module = await import(`@/locales/${finalLanguage}.json`);
     return module.default;
