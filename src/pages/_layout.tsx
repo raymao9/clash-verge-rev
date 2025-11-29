@@ -305,7 +305,7 @@ const Layout = () => {
 
   useEffect(() => {
     if (language) {
-      dayjs.locale(language === "zhtw" ? "zh-tw" : language);
+      dayjs.locale(language === "tw" ? "zh-tw" : language);
       dayjs.locale(language === "zh" ? "zh-cn" : language);
       switchLanguage(language);
     }

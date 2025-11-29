@@ -32,7 +32,7 @@ const OS = getSystem();
 
 const languageOptions = supportedLanguages.map((code) => {
   const labels: { [key: string]: string } = {
-    zhtw: "繁體中文",
+    tw: "繁體中文",
     zh: "简体中文",
     en: "English",
   };
@@ -81,7 +81,7 @@ const SettingVergeBasic = ({ onError }: Props) => {
 
       <SettingItem label={t("Language")}>
         <GuardState
-          value={language || "zhtw"}
+          value={language || "tw"}
           onCatch={onError}
           onFormat={(e: any) => e.target.value}
           onChange={(e) => onChangeData({ language: e })}

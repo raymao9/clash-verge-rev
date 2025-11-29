@@ -9,7 +9,7 @@ use std::{
 };
 use sys_locale;
 
-const DEFAULT_LANGUAGE: &str = "zhtw";
+const DEFAULT_LANGUAGE: &str = "tw";
 
 type TranslationMap = (String, HashMap<String, Arc<str>>);
 
@@ -52,7 +52,7 @@ pub async fn current_language() -> String {
     // 關鍵修正：在回傳前進行檢查和轉換
     if language == "zh" {
         // 如果讀取到的語言是簡體代碼，強制轉換為繁體代碼
-        "zhtw".to_string().into()
+        "tw".to_string().into()
     } else {
         // 否則，返回讀取到的值
         language

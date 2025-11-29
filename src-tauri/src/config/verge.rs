@@ -340,9 +340,9 @@ impl IVerge {
             .to_lowercase();
 
         // 🚨 步驟 1：特別處理繁體中文地區 🚨
-        // 如果系統地區碼是 zh-tw (繁體中文)，則強制使用 "zhtw"
+        // 如果系統地區碼是 zh-tw (繁體中文)，則強制使用 "tw"
         if sys_lang.contains("zh-tw") {
-            return String::from("zhtw");
+            return String::from("tw");
         }
 
         let lang_code = sys_lang.split(['_', '-']).next().unwrap_or("en");
