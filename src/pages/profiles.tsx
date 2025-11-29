@@ -553,7 +553,7 @@ const ProfilePage = () => {
   useEffect(() => {
     (async () => {
       if (current) {
-        mutateProfiles();
+        await mutateProfiles();
         await activateProfile(current, false);
       }
     })();
