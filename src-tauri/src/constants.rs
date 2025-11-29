@@ -6,9 +6,9 @@ pub mod network {
 
     pub mod ports {
         #[cfg(not(target_os = "windows"))]
-	pub const DEFAULT_REDIR: u16 = 1088;
+        pub const DEFAULT_REDIR: u16 = 1088;
         #[cfg(target_os = "linux")]
-	pub const DEFAULT_TPROXY: u16 = 7896;
+        pub const DEFAULT_TPROXY: u16 = 7896;
         pub const DEFAULT_SOCKS: u16 = 1080;
         pub const DEFAULT_HTTP: u16 = 1087;
 
