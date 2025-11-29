@@ -41,13 +41,22 @@ pub fn get_supported_languages() -> Vec<String> {
 }
 
 pub async fn current_language() -> String {
-    Config::verge()
+    let language: String = Config::verge()
         .await
         .latest_arc()
         .language
         .as_deref()
         .map(String::from)
-        .unwrap_or_else(get_system_language)
+        .unwrap_or_else(get_system_language);
+
+    // 關鍵修正：在回傳前進行檢查和轉換
+    if language == "zh" {
+        // 如果讀取到的語言是簡體代碼，強制轉換為繁體代碼
+        "zhtw".to_string().into()
+    } else {
+        // 否則，返回讀取到的值
+        language
+    }
 }
 
 static TRANSLATIONS: Lazy<RwLock<TranslationMap>> = Lazy::new(|| {
