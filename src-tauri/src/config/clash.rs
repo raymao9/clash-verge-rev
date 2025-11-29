@@ -64,8 +64,6 @@ impl IClashTemp {
         map.insert("redir-port".into(), network::ports::DEFAULT_REDIR.into());
         #[cfg(target_os = "linux")]
         map.insert("tproxy-port".into(), network::ports::DEFAULT_TPROXY.into());
-
-        map.insert("mixed-port".into(), network::ports::DEFAULT_MIXED.into());
         map.insert("socks-port".into(), network::ports::DEFAULT_SOCKS.into());
         map.insert("port".into(), network::ports::DEFAULT_HTTP.into());
         map.insert("log-level".into(), "info".into());
