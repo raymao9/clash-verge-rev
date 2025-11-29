@@ -9,7 +9,7 @@ use std::{
 };
 use sys_locale;
 
-const DEFAULT_LANGUAGE: &str = "zh";
+const DEFAULT_LANGUAGE: &str = "zhtw";
 
 type TranslationMap = (String, HashMap<String, Arc<str>>);
 

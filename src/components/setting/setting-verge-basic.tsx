@@ -81,7 +81,7 @@ const SettingVergeBasic = ({ onError }: Props) => {
 
       <SettingItem label={t("Language")}>
         <GuardState
-          value={language ?? "en"}
+          value={language || "zhtw"}
           onCatch={onError}
           onFormat={(e: any) => e.target.value}
           onChange={(e) => onChangeData({ language: e })}
@@ -111,7 +111,7 @@ const SettingVergeBasic = ({ onError }: Props) => {
       {OS !== "linux" && (
         <SettingItem label={t("Tray Click Event")}>
           <GuardState
-            value={tray_event ?? "main_window"}
+            value={tray_event ?? "tray_menu"}
             onCatch={onError}
             onFormat={(e: any) => e.target.value}
             onChange={(e) => onChangeData({ tray_event: e })}

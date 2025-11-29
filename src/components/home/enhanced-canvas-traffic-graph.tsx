@@ -236,7 +236,7 @@ export const EnhancedCanvasTrafficGraph = memo(
 
           // 格式化时间戳
           const timeStr = dataPoint.timestamp
-            ? new Date(dataPoint.timestamp).toLocaleTimeString("zh-CN", {
+            ? new Date(dataPoint.timestamp).toLocaleTimeString("zh-TW", {
                 hour: "2-digit",
                 minute: "2-digit",
                 second: "2-digit",
