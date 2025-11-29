@@ -61,6 +61,7 @@ import { navItems } from "./_routers";
 
 import "dayjs/locale/ru";
 import "dayjs/locale/zh-cn";
+import "dayjs/locale/zh-tw";
 
 export const portableFlag = false;
 
@@ -304,6 +305,7 @@ const Layout = () => {
 
   useEffect(() => {
     if (language) {
+      dayjs.locale(language === "tw" ? "zh-tw" : language);
       dayjs.locale(language === "zh" ? "zh-cn" : language);
       switchLanguage(language);
     }
