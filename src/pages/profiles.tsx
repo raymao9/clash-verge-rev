@@ -386,6 +386,14 @@ const ProfilePage = () => {
           switchingProfileRef.current === profile &&
           !abortController.signal.aborted
         ) {
+          // 新增：在执行后台任务（激活选中代理）之前，清理所有旧连接
+          try {
+            closeAllConnections();
+            console.log(`[Profile] 后台：旧连接已清理，序列号: ${sequence}`);
+          } catch (e) {
+            console.warn("[Profile] 后台：清理连接失败，但继续:", e);
+          }
+
           await activateSelected();
           console.log(`[Profile] 后台处理完成，序列号: ${sequence}`);
         } else {
@@ -473,8 +481,9 @@ const ProfilePage = () => {
         }
 
         // 完成切换
-        await mutateLogs();
-        closeAllConnections();
+        //await mutateLogs();
+        //closeAllConnections();
+        void mutateLogs(); // 使用 void 讓它非阻塞
 
         if (notifySuccess && success) {
           showNotice("success", t("Profile Switched"), 1000);
@@ -492,7 +501,7 @@ const ProfilePage = () => {
               currentSequence,
               currentAbortController,
             ),
-          50,
+          200,
         );
       } catch (err: any) {
         if (pendingRequestRef.current) {
