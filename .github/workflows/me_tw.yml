@@ -4,7 +4,6 @@ on:
   workflow_dispatch:
   push:
     branches: [zh_TW_v2.4.3]
-    tags: [zh_TW_v2.4.3]
 permissions: write-all
 env:
   CARGO_INCREMENTAL: 0
@@ -33,52 +32,31 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Fetch UPDATE logs
-        id: fetch_update_logs
-        run: |
-          if [ -f "UPDATELOG.md" ]; then
-            UPDATE_LOGS=$(awk '/^## v/{if(flag) exit; flag=1} flag' UPDATELOG.md)
-            if [ -n "$UPDATE_LOGS" ]; then
-              echo "Found update logs"
-              echo "UPDATE_LOGS<<EOF" >> $GITHUB_ENV
-              echo "$UPDATE_LOGS" >> $GITHUB_ENV
-              echo "EOF" >> $GITHUB_ENV
-            else
-              echo "No update sections found in UPDATELOG.md"
-            fi
-          else
-            echo "UPDATELOG.md file not found"
-          fi
-        shell: bash
-
       - name: Set Env
         run: |
           echo "BUILDTIME=$(TZ=Asia/Shanghai date)" >> $GITHUB_ENV
           TAG_REF="${GITHUB_REF##*/}"
-          echo "TAG_NAME=$TAG_REF" >> $GITHUB_ENV
-          VERSION=$(echo "$TAG_REF" | sed 's/^v//')
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "DOWNLOAD_URL=https://github.com/clash-verge-rev/clash-verge-rev/releases/download/$TAG_REF" >> $GITHUB_ENV
-        shell: bash
+          CLEAN_TAG_NAME="$TAG_REF"
 
-      - run: |
-          if [ -z "$UPDATE_LOGS" ]; then
-            echo "No update logs found, using default message"
-            UPDATE_LOGS="More new features are now supported. Check for detailed changelog soon."
-          else
-            echo "Using found update logs"
+          # 檢查是否在分支上運行，如果是，則清除前綴。
+          if [[ "$GITHUB_REF" == refs/heads/* ]]; then
+            # Bash 字串替換：移除前綴 "zh_TW_"
+            CLEAN_TAG_NAME="${TAG_REF/zh_TW_/}"
           fi
+          CLEAN_TAG_NAME="${CLEAN_TAG_NAME}.tw"
 
-          cat > release.txt << EOF
-          $UPDATE_LOGS
+          echo "TAG_NAME=$CLEAN_TAG_NAME" >> $GITHUB_ENV
+          VERSION=$(echo "$CLEAN_TAG_NAME" | sed 's/^v//')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "DOWNLOAD_URL=https://github.com/clash-verge-rev/clash-verge-rev/releases/download/$CLEAN_TAG_NAME" >> $GITHUB_ENV
+        shell: bash
 
       - name: Upload Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG_NAME }}
-          name: "Clash Verge Rev ${{ env.TAG_NAME }}"
-          body_path: release.txt
-          draft: false
+          name: "Clash Verge Rev zh_TW_${{ env.TAG_NAME }}"
+          draft: true
           prerelease: ${{ contains(github.ref_name, '-rc') }}
           token: ${{ secrets.GITHUB_TOKEN }}
           # generate_release_notes: true
