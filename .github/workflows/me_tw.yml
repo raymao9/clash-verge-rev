@@ -4,7 +4,6 @@ on:
   workflow_dispatch:
   push:
     branches: [zh_TW_v2.4.3]
-    tags: [zh_TW_v2.4.3]
 permissions: write-all
 env:
   CARGO_INCREMENTAL: 0
