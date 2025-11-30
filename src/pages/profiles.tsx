@@ -32,7 +32,7 @@ import { useLockFn } from "ahooks";
 import { throttle } from "lodash-es";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import useSWR, { mutate } from "swr";
 import { closeAllConnections } from "tauri-plugin-mihomo-api";
 
@@ -60,6 +60,8 @@ import {
 } from "@/services/cmds";
 import { showNotice } from "@/services/noticeService";
 import { useSetLoadingCache, useThemeMode } from "@/services/states";
+
+// 引入 useNavigate
 
 // 记录profile切换状态
 const debugProfileSwitch = (action: string, profile: string, extra?: any) => {
@@ -102,6 +104,7 @@ const isOperationAborted = (
 const ProfilePage = () => {
   const { t } = useTranslation();
   const location = useLocation();
+  const navigate = useNavigate();
   const { addListener } = useListen();
   const [url, setUrl] = useState("");
   const [disabled, setDisabled] = useState(false);
@@ -290,6 +293,9 @@ const ProfilePage = () => {
     }
     setLoading(true);
 
+    // 聲明變量以儲存新的 ID
+    let newProfileId: string | undefined;
+
     const handleImportSuccess = async (noticeKey: string) => {
       showNotice("success", t(noticeKey));
       setUrl("");
@@ -298,19 +304,31 @@ const ProfilePage = () => {
 
     try {
       // 尝试正常导入
-      await importProfile(url);
+      const result = await importProfile(url);
+      newProfileId = result.uid;
       await handleImportSuccess("Profile Imported Successfully");
+
+      // 【可選增強】：手動導入成功後，立即激活
+      if (newProfileId) {
+        await activateProfile(newProfileId, true);
+      }
     } catch (initialErr) {
       console.warn("[订阅导入] 首次导入失败:", initialErr);
 
       showNotice("info", t("Import failed, retrying with Clash proxy..."));
       try {
         // 使用自身代理尝试导入
-        await importProfile(url, {
+        const result = await importProfile(url, {
           with_proxy: false,
           self_proxy: true,
         });
+        newProfileId = result.uid;
         await handleImportSuccess("Profile Imported with Clash proxy");
+
+        // 【可選增強】：手動導入成功後，立即激活
+        if (newProfileId) {
+          await activateProfile(newProfileId, true);
+        }
       } catch (retryErr: any) {
         // 回退导入也失败
         const retryErrmsg = retryErr?.message || retryErr.toString();
@@ -320,6 +338,11 @@ const ProfilePage = () => {
         );
       }
     } finally {
+      // 【關鍵修復點】：在所有導入嘗試結束後，如果成功獲取到 ID，則激活
+      if (newProfileId) {
+        // 由於 performRobustRefresh 已經完成，此時 profiles 列表應該是新的
+        await activateProfile(newProfileId, true);
+      }
       setDisabled(false);
       setLoading(false);
     }
@@ -595,14 +618,20 @@ const ProfilePage = () => {
         await new Promise((resolve) => setTimeout(resolve, 100)); // 2. 執行激活操作
         /* eslint-enable @eslint-react/web-api/no-leaked-timeout */
 
-        // activateProfile 內建了檢查機制，確保只在列表存在時才切換
+        // 2. 執行激活操作，activateProfile 內建了檢查機制，確保只在列表存在時才切換
         await activateProfile(current, false);
+
+        // 3. 【關鍵修復點】：清理路由狀態
+        // 使用 replace: true 替換當前歷史記錄，並將 state 設為 undefined
+        navigate(location.pathname, { state: undefined, replace: true });
+
+        debugProfileSwitch("URL_SCHEME_CLEANUP", current, "已清理路由狀態");
 
         // 可選：切換成功後，清除路由狀態，防止重複執行
         //history.replace({ ...location, state: undefined });
       }
     })();
-  }, [location, activateProfile, mutateProfiles]);
+  }, [location, activateProfile, mutateProfiles, navigate]);
 
   const onEnhance = useLockFn(async (notifySuccess: boolean) => {
     if (switchingProfileRef.current) {
