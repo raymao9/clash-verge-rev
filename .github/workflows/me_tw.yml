@@ -24,46 +24,41 @@ jobs:
         with:
           fetch-depth: 0
 
-  update_tag:
-    name: Update tag
+  set_release_tag:
+    name: Calculate Custom Tag Name
     runs-on: ubuntu-latest
-    needs: [release]
+    # 輸出計算好的 Tag 名稱，供其他 Job 使用
+    outputs:
+      tag_name: ${{ steps.calculate.outputs.tag_name }}
+      base_version: ${{ steps.calculate.outputs.base_version }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set Env
+      - name: Calculate Tag Name
+        id: calculate
         run: |
-          echo "BUILDTIME=$(TZ=Asia/Shanghai date)" >> $GITHUB_ENV
+          # 獲取分支名稱，例如 zh_TW_v2.4.3
           TAG_REF="${GITHUB_REF##*/}"
           CLEAN_TAG_NAME="$TAG_REF"
 
-          # 檢查是否在分支上運行，如果是，則清除前綴。
+          # 檢查是否在分支上運行
           if [[ "$GITHUB_REF" == refs/heads/* ]]; then
             # Bash 字串替換：移除前綴 "zh_TW_"
             CLEAN_TAG_NAME="${TAG_REF/zh_TW_/}"
           fi
-          CLEAN_TAG_NAME="${CLEAN_TAG_NAME}.tw"
 
-          echo "TAG_NAME=$CLEAN_TAG_NAME" >> $GITHUB_ENV
-          VERSION=$(echo "$CLEAN_TAG_NAME" | sed 's/^v//')
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "DOWNLOAD_URL=https://github.com/clash-verge-rev/clash-verge-rev/releases/download/$CLEAN_TAG_NAME" >> $GITHUB_ENV
+          # 1. 基礎版本號 (v2.4.3)
+          BASE_VERSION="$CLEAN_TAG_NAME"
+          
+          # 2. 最終 Tag 名稱 (v2.4.3.tw)
+          FINAL_TAG_NAME="${BASE_VERSION}.tw"
+
+          # 設置為 Job Output
+          echo "tag_name=$FINAL_TAG_NAME" >> $GITHUB_OUTPUT
+          echo "base_version=$BASE_VERSION" >> $GITHUB_OUTPUT
         shell: bash
-
-      - name: Upload Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.TAG_NAME }}
-          name: "Clash Verge Rev zh_TW_${{ env.TAG_NAME }}"
-          draft: true
-          prerelease: ${{ contains(github.ref_name, '-rc') }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          # generate_release_notes: true
 
   release:
     name: Release Build
-    needs: [check_tag_version]
+    needs: [check_tag_version, set_release_tag]
     strategy:
       fail-fast: false
       matrix:
@@ -136,8 +131,9 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: "Clash Verge Rev ${{ github.ref_name }}"
+          #tagName: ${{ github.ref_name }}
+          tagName: ${{ needs.set_release_tag.outputs.tag_name }}
+          releaseName: "Clash Verge Rev ${{ needs.set_release_tag.outputs.base_version }} zh_TW"
           releaseDraft: false
           uploadAssets: true
           prerelease: ${{ contains(github.ref_name, '-rc') }}
@@ -149,7 +145,7 @@ jobs:
     if: ${{ !contains(github.ref_name, '-rc') }}
     name: Release Update
     runs-on: ubuntu-latest
-    needs: [update_tag]
+    needs: [release]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
