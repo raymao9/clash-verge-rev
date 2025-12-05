@@ -18,6 +18,8 @@ jobs:
   check_tag_version:
     name: Check Release Tag and package.json Version Consistency
     runs-on: ubuntu-latest
+    outputs:
+      cleaned_tag_version: ${{ steps.check_tag.outputs.CLEAN_TAG_VERSION }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -25,16 +27,17 @@ jobs:
           fetch-depth: 0
 
       - name: Check tag and package.json version
+        id: check_tag
         run: |
           TAG_REF="${GITHUB_REF_NAME:-${GITHUB_REF##*/}}"
           echo "Current tag: $TAG_REF"
 
           PKG_VERSION=$(jq -r .version package.json)
           echo "package.json version: $PKG_VERSION"
-
+          CLEAN_TAG_VERSION=$(echo "$TAG_REF" | sed 's/^zh_TW_//' | sed 's/^v//')
           EXPECTED_TAG="v$PKG_VERSION"
 
-          if [[ "$TAG_REF" != "$EXPECTED_TAG" ]]; then
+          if [[ "$CLEAN_TAG_VERSION" != "$EXPECTED_TAG" ]]; then
             echo "❌ Version mismatch:"
             echo "   Git tag       : $TAG_REF"
             echo "   package.json  : $EXPECTED_TAG"
@@ -42,6 +45,7 @@ jobs:
           fi
 
           echo "✅ Tag and package.json version are consistent."
+          echo "CLEAN_TAG_VERSION=$CLEAN_TAG_VERSION" >> $GITHUB_OUTPUT
 
   update_tag:
     name: Update tag
@@ -174,7 +178,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
-          tagName: ${{ github.ref_name }}
+          tagName: v${{ needs.check_tag_version.outputs.cleaned_tag_version }}
           releaseName: "Clash Verge Rev ${{ github.ref_name }}"
           releaseBody: "Draft release, will be updated later."
           releaseDraft: true
