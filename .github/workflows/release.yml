@@ -111,7 +111,6 @@ jobs:
         with:
           tag_name: ${{ env.TAG_NAME }}
           name: "Clash Verge Rev ${{ env.TAG_NAME }}"
-          body_path: release.txt
           draft: false
           prerelease: ${{ contains(github.ref_name, '-rc') }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -317,7 +316,6 @@ jobs:
         with:
           tag_name: v${{env.VERSION}}
           name: "Clash Verge Rev v${{env.VERSION}}"
-          body: "See release notes for detailed changelog."
           token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: ${{ contains(github.ref_name, '-rc') }}
           files: |
@@ -411,7 +409,6 @@ jobs:
         with:
           tag_name: v${{steps.build.outputs.appVersion}}
           name: "Clash Verge Rev v${{steps.build.outputs.appVersion}}"
-          body: "See release notes for detailed changelog."
           token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: ${{ contains(github.ref_name, '-rc') }}
           files: src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*setup*
