@@ -47,7 +47,7 @@ jobs:
 
           # 1. 基礎版本號 (v2.4.3)
           BASE_VERSION="$CLEAN_TAG_NAME"
-          
+
           # 2. 最終 Tag 名稱 (v2.4.3.tw)
           FINAL_TAG_NAME="${BASE_VERSION}.tw"
 
